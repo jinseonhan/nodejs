@@ -22,12 +22,12 @@
         <ul class="list-group">
           <% for(var i=0;i < posts.length;i++){ %>
             <li class="list-group-item">
-                <h4>할일 제목<%=i+1%>  : <%=posts[i].제목 %></h4> 
-                <p>할일 마감 날짜 <%=i+1%> :<%=posts[i].날짜 %> </p>
+                <h4>할일 제목<%=i+1%>  : <%=posts[i].title %></h4> 
+                <p>할일 마감 날짜 <%=i+1%> :<%=posts[i].date %> </p>
                 <button class="btn btn-danger delete" data-id="<%=posts[i]._id %>">삭제</button>
                 <button class="btn btn-danger edite" data-id="" onclick="editPage('<%=posts[i]._id %>');">수정</button>          
-                <button type="button" class="btn btn-warning"  onclick="chatPage('<%=posts[i]._id %>');">채팅하기</button>
-
+                <!-- <button type="button" class="btn btn-warning"  onclick="chatPage('<%=posts[i]._id %>');">채팅하기</button> -->
+                <button type="button" class="btn btn-warning chat"  data-id="<%= posts[i].regUser%>">채팅하기</button>
             </li>
           <%} %>
         </ul>
@@ -68,12 +68,26 @@
        });
        
        // 채팅하기
-       function chatPage(param){
-        document.submitForm.targetId.value=param;
-        document.submitForm.action ="/chat/chatroom";
-        document.submitForm.method="post";
-        document.submitForm.submit();
-       }
+       $('.chat').click(function(e){
+          var id = e.target.dataset.id; // 채팅당한 사람의 id
+          
+        $.post('/chat/chatroom',{target:id}).then((result)=>{
+
+        });
+       });
+
+
+
+      //  function chatPage(param){
+      //   document.submitForm.targetId.value=param;
+      //   document.submitForm.action ="/chat/chatroom";
+      //   document.submitForm.method="post";
+      //   document.submitForm.submit();
+      //  }
+
+
+
+
       </script>
       
 

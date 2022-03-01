@@ -40,10 +40,23 @@
     </style>
 
     <script>
+      $(document).ready(function(){
+        var targetId = $("#targetId").val();
+        var eventSource;
+        eventSource = new EventSource('/chatConnection'+targetId);
+        eventSource.addEventListener('test',function(e){
+          console.log(JSON.parse(e.data));
+        });
+      });
+        
+      
       // 채팅 보내기
       function chatSubmit(){
         var chat = $("#chat-input").val(); // 채팅 내용
         var targetId = $("#targetId").val(); // 대화 상대
+
+       
+
         $.ajax({
             method : 'post'
             , url : '/chat/memoSubmit'
@@ -56,6 +69,7 @@
               var html ='';
               html = '<li><span class="chat-box mine">'+chat+'</span></li>';
               $(".chat-content").append(html);
+              $("#chat-input").val('');
             }else{
               alert('메시지 전송에 실패하였습니다!');
             }
@@ -80,7 +94,6 @@
        <div class="col-9 p-0">
          <div class="chat-room">
             <ul class="list-group chat-content">
-              <li><span class="chat-box mine">하이</span></li> 
               <%  
                 if(chat!=null){
                  for(var i=0;i < chat.length;i++){ 

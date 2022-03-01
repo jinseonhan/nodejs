@@ -109,7 +109,7 @@ app.get('/list', function(req,res){
 
 app.put('/edit',function(req,res){
     // form에 담긴 제목, 날짜 데이터를 db.collection에 update
-    db.collection('post').updateOne({_id: parseInt(req.body.id)},{$set : {제목:req.body.title, 날짜:req.body.date}},function(error,result){
+    db.collection('post').updateOne({_id: parseInt(req.body.id)},{$set : {title:req.body.title, date:req.body.date}},function(error,result){
         console.log('수정완료'); // $set : 없는 값은 insert가 됨
     });
 });
@@ -184,7 +184,7 @@ passport.use(new LocalStrategy({
         let register = req.user.id;
     
         let totalPost = result.totalPost;
-        db.collection('post').insertOne({_id:totalPost+1, 제목 : title, 날짜 : date, 작성자 : register },function(error,result){
+        db.collection('post').insertOne({_id:totalPost+1, title : title, date : date, regUser : register },function(error,result){
             db.collection('counter').updateOne({name:'게시물갯수'},{$inc:{totalPost:+1}},function(error,result){
                 // 콜백함수
                 if(error){return console.log(error);}
@@ -199,7 +199,7 @@ passport.use(new LocalStrategy({
 });
 app.delete('/delete',function(req,res){
     // 요청.body에 담겨온 게시물번호를 가진 글을 db에서 찾아서 삭제 
-    var deleteData = {_id : parseInt(req.body._id), 작성자 : req.user.id}    
+    var deleteData = {_id : parseInt(req.body._id), regUser : req.user.id}    
     
     db.collection('post').deleteOne(deleteData,function(error,result){
         console.log('삭제완료');
@@ -237,11 +237,11 @@ app.delete('/delete',function(req,res){
             index : 'titleSearch',
             text :{
                 query : req.query.value,
-                path : '제목' // 제목날짜 둘다 찾고싶으면 [ '제목', '날짜' ]
+                path : 'title' // 제목날짜 둘다 찾고싶으면 [ '제목', '날짜' ]
             }
         }
      },
-     {$project : {제목 : 1, _id:0,score:{$meta:"searchScore"}}} // 검색조건 필터 + 스코어
+     {$project : {title : 1, _id:0,score:{$meta:"searchScore"}}} // 검색조건 필터 + 스코어
     //  {$sort:{_id : 1}}, // 검색조건 : 정렬
     //  {$limit : 3}    // 검색조건 : 상위 3개
     ];
