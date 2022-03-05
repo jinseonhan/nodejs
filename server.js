@@ -59,6 +59,23 @@ function errorCheck(error){
       }
 }
 
+// 암호화
+const createSalt = () =>
+    new Promise((resolve, reject) => {
+        crypto.randomBytes(64, (err, buf) => {
+            if (err) reject(err);
+            resolve(buf.toString('base64'));
+        });
+    });
+const createHashedPassword = (plainPassword) =>
+  new Promise(async (resolve, reject) => {
+      const salt = await createSalt();
+      crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
+          if (err) reject(err);
+          resolve({ password: key.toString('base64'), salt });
+      });
+  });
+
 // detail 로 접속하면 상세페이지 detail.ejs를 보여줌
 app.get('/detail/:id',function(req,res){ // :id : parameter
 
@@ -110,12 +127,12 @@ app.get('/list', function(req,res){
 app.put('/edit',function(req,res){
     // form에 담긴 제목, 날짜 데이터를 db.collection에 update
     db.collection('post').updateOne({_id: parseInt(req.body.id)},{$set : {title:req.body.title, date:req.body.date}},function(error,result){
-        console.log('수정완료'); // $set : 없는 값은 insert가 됨
+        //console.log('수정완료'); // $set : 없는 값은 insert가 됨
     });
 });
 
 app.get('/myPage',loginCheck,function(req,res){ // url , 콜백전 실행 함수
-    console.log(req.user); // string값을 붙이면 데이터값들이 찍히지 않고 (String값+[obj:obj])로 나온다.
+    //console.log(req.user); // string값을 붙이면 데이터값들이 찍히지 않고 (String값+[obj:obj])로 나온다.
     res.render('myPage.ejs',{data:req.user});
 });
 
@@ -202,9 +219,9 @@ app.delete('/delete',function(req,res){
     var deleteData = {_id : parseInt(req.body._id), regUser : req.user.id}    
     
     db.collection('post').deleteOne(deleteData,function(error,result){
-        console.log('삭제완료');
+        // console.log('삭제완료');
         // 200, 400, 500 에러 분기처리해야 함
-        if(result) {console.log(result)}
+        // if(result) {console.log(result)}
         res.status(200).send({message: 'success', error:error});
 
         // res.status(400).send({message: 'success', error:error}); // 에러는 값을 전송할 수 없음.
@@ -212,19 +229,11 @@ app.delete('/delete',function(req,res){
     });
 
 });
-
-
-  app.post('/register',function(req,res){
-        //  기능 만들기
-        // 1. 아이디 저장전 중복 체크
-        // 2. id가 정해진 형식대로 작성되었는지
-         // 3. pwd는 암호화 했나
-
-    db.collection('login').insertOne({ id: req.body.id, pw : req.body.pw},function(error,result){
-        res.redirect('/');
-    });
+  app.get('/registPage',function(req,res){
+    res.render("registPage.ejs");
   });
 
+ 
 
 
   // list - 검색기능
@@ -246,7 +255,7 @@ app.delete('/delete',function(req,res){
     //  {$limit : 3}    // 검색조건 : 상위 3개
     ];
     db.collection('post').aggregate(searchCondition).toArray(function(error,result){
-       console.log(result);
+       //console.log(result);
         // index : or 검색, 빠른 검색가능 , '-' : 해당내용 제외, 더블 커텐션 ("") : 정확히 일치하는 것만 검색, 띄어쓰기 기준으로 검색
         res.render('list.ejs',{posts: result});
     });
@@ -303,3 +312,5 @@ app.delete('/delete',function(req,res){
   app.use('/shop',require('./routes/shop.js')); // node.js 에서는 server.js의 현재경로에서 부터 시작하는것이 국룰이란다.
   app.use('/board/sub',require('./routes/board.js')); 
   app.use('/chat',require('./routes/chat.js'));
+  app.use('/member',require('./routes/member.js')); 
+  

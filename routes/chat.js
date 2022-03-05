@@ -64,7 +64,7 @@ router.post('/msg',function(req,res){
     }
 
     db.collection('message').insertOne(data).then((result)=>{
-        console.log(result);
+       // console.log(result);
         res.send('저장 성공');
     }).catch(()=>{
         res.send('저장 실패');
