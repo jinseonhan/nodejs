@@ -1,6 +1,12 @@
 //const { render } = require('express/lib/response');
 
 var router = require('express').Router(); // 라우터 만들때 필수!
+var crypto = require('crypto'); // 암호화
+
+// 회원 가입페이지
+router.get('/registPage',function(req,res){
+    res.render("registPage.ejs");
+  });
 
 // 아이디 중복 체크
 router.post('/idDuplicateChk',function(req,res){
@@ -22,7 +28,8 @@ router.post('/idDuplicateChk',function(req,res){
 
 router.post('/regist',function(req,res){
     var userId = req.body.id;
-    var userPw = req.body.pw;    
+    var userPw = crypto.createHash('sha512').update(req.body.pw).digest('base64');
+    
     //  기능 만들기
     
         // 1. 아이디 저장전 중복 체크
@@ -38,3 +45,4 @@ router.post('/regist',function(req,res){
   
 
   module.exports = router; // module.exports = 내보낼 변수명
+

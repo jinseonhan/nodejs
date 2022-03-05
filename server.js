@@ -14,6 +14,7 @@ const session = require('express-session');
 app.use(session({secret:'secretCode', resave:true, saveUninitialized:false}));
 app.use(passport.initialize());
 app.use(passport.session());
+var crypto = require('crypto'); // 암호화
 
 
 
@@ -58,23 +59,6 @@ function errorCheck(error){
         return res.status(409).send('conflict. entity already exists')
       }
 }
-
-// 암호화
-const createSalt = () =>
-    new Promise((resolve, reject) => {
-        crypto.randomBytes(64, (err, buf) => {
-            if (err) reject(err);
-            resolve(buf.toString('base64'));
-        });
-    });
-const createHashedPassword = (plainPassword) =>
-  new Promise(async (resolve, reject) => {
-      const salt = await createSalt();
-      crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
-          if (err) reject(err);
-          resolve({ password: key.toString('base64'), salt });
-      });
-  });
 
 // detail 로 접속하면 상세페이지 detail.ejs를 보여줌
 app.get('/detail/:id',function(req,res){ // :id : parameter
@@ -147,13 +131,16 @@ function loginCheck(req,res,next){
 }
 
 app.get('/login',function(req,res){
+
     res.render('login.ejs');
 });
 
 app.post('/login',passport.authenticate('local',{
-    failureRedirect : '/fail'
+    failureRedirect : '/fail' // TODO : 여기에 pwd 5번 틀렸을시 로그인 막기
 }),function(req,res){
-    res.redirect('/');
+  // TODO : 로그인 로그 기록 저장
+  
+  res.redirect('/');
 });
 
 app.get('/fail',function(req,res){
@@ -173,7 +160,7 @@ passport.use(new LocalStrategy({
       if (error) return done(error)
   
       if (!result) return done(null, false, { message: '존재하지않는 아이디입니다.' });  // 서버에러, 성공시 사용자 db데이터, 에러메시지 
-      if (pw == result.pw) {
+      if (crypto.createHash('sha512').update(pw).digest('base64') == result.pw) {
         return done(null, result);
       } else {
         return done(null, false, { message: '비번번호를 잘못입력하셨습니다.' });
@@ -229,10 +216,7 @@ app.delete('/delete',function(req,res){
     });
 
 });
-  app.get('/registPage',function(req,res){
-    res.render("registPage.ejs");
-  });
-
+ 
  
 
 
