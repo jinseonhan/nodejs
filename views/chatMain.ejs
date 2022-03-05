@@ -62,10 +62,8 @@
   
        <div class="col-9 p-0">
          <div class="chat-room">
-            <ul class="list-group chat-content">
-              <li><span class="chat-box">채팅방1 내용</span></li>
-              <li><span class="chat-box">채팅방1 내용</span></li>
-              <li><span class="chat-box mine">채팅방1 내용</span></li>
+            <ul class="list-group chat-content" id="chatContent">
+              
             </ul>
           <div class="input-group">
             <input class="form-control" id="chat-input">
@@ -87,9 +85,15 @@
         eventSource = new EventSource('/chat/message/'+parent);
         eventSource.addEventListener('test',function(e){
           // 서버에서 받은 메시지
-          console.log(JSON.parse(e.data));
-
-          
+          //console.log(JSON.parse(e.data));
+          var chatList = (JSON.parse(e.data));
+          var html ='';
+          for(var i =0;i<chatList.length;i++){
+            html+='<li>';
+            html+='<span class="chat-box mine">'+chatList[i].content+'</span>';
+            html+='</li>';
+          }
+          $("#chatContent").append(html);
 
         });
       });
@@ -100,8 +104,14 @@
           parent : parent,
           content : content
         }
+        var html='';
         $.post('/chat/msg',items).then(()=>{
-          console.log('전송 성공!');
+             $("#chat-input").val('');
+            html+='<li>';
+            html+='<span class="chat-box mine">'+content+'</span>';
+            html+='</li>';
+            $("#chatContent").append(html);
+
         });
       });
 //     });
