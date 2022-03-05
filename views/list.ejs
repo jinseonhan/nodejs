@@ -27,7 +27,7 @@
                 <button class="btn btn-danger delete" data-id="<%=posts[i]._id %>">삭제</button>
                 <button class="btn btn-danger edite" data-id="" onclick="editPage('<%=posts[i]._id %>');">수정</button>          
                 <!-- <button type="button" class="btn btn-warning"  onclick="chatPage('<%=posts[i]._id %>');">채팅하기</button> -->
-                <button type="button" class="btn btn-warning chat"  data-id="<%= posts[i].regUser%>">채팅하기</button>
+                <button type="button" class="btn btn-warning chat"  data-id="<%= posts[i]._id%>">채팅하기</button>
             </li>
           <%} %>
         </ul>
@@ -68,13 +68,13 @@
        });
        
        // 채팅하기
-       $('.chat').click(function(e){
+      
+        $('.chat').click(function(e){
           var id = e.target.dataset.id; // 채팅당한 사람의 id
-          
-        $.post('/chat/chatroom',{target:id}).then((result)=>{
+          $.post('/chat/chatroom',{target:id}).then((result)=>{
 
+          });
         });
-       });
 
 
 

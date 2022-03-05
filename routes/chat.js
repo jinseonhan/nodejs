@@ -17,17 +17,20 @@ router.use(loginCheck);
 // 
 router.get('/message/:parent',function(req,res){
  
-    res.writeHead(200,{
-       "Connection":"keep-alive",
-       "Content" :"text/event-stream",
-       "Cache-Control":"no-cache"
-    });
-
+    res.writeHead(200, {
+        "Connection": "keep-alive",
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+      });
+      
+    //  res.write('event: test\n');
+    //  res.write('data: 안녕하세여\n\n');
+    
     db.collection('message').find({parent:req.params.parent}).toArray().then((result)=>{
-        res.write('event : test\n');
-        res.write('data :'+ JSON.stringify(result) +'\n\n');
-
-    });
+          res.write('event: test\n'); // event: << 붙여써야함
+          res.write('data:'+ JSON.stringify(result) +'\n\n'); // data:  붙여써야함
+         
+     });
 
     
 });
@@ -37,7 +40,6 @@ router.post('/chatroom',function(req,res){
         member : [req.body.target,req.user.id],
         date : new Date()
     }
-
     db.collection('chatroom').insertOne(data).then((result)=>{
         res.send('성공!');
     });

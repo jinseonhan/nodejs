@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="ko">
   <head>
     <!-- Required meta tags -->
@@ -38,34 +37,7 @@
         } 
 
     </style>
-    <script>
-      var parent;
-      var eventsource;
-      $(document).ready(function(){
-        $(".list-group-item").click(function(){
-          parent = this.dataset.id;
-          
-          eventsource = new EventSource('/message/'+parent);
-          eventsource.addEventListener('test',function(e){
-            console.log(e.data);
-            
 
-          });
-        });
-
-        $("#send").click(function(){
-          var content = $("#chat-input").val();
-          var items ={
-            parent : parent,
-            content : content
-          }
-          $.post('/chat/msg',items).then(()=>{
-            console.log('전송 성공!');
-          });
-        });
-      });
-  
-    </script>
   </head>
   <%- include('nav.html')%>
 
@@ -105,4 +77,33 @@
   
   </div> 
   </body>
+  <script>
+    var parent;
+    var eventSource;
+//      $(document).ready(function(){
+      $(".list-group-item").click(function(){
+        parent = this.dataset.id;
+        console.log(parent);
+        eventSource = new EventSource('/chat/message/'+parent);
+        eventSource.addEventListener('test',function(e){
+          // 서버에서 받은 메시지
+          console.log(JSON.parse(e.data));
+
+          
+
+        });
+      });
+      $("#send").click(function(){
+            
+        var content = $("#chat-input").val();
+        var items ={
+          parent : parent,
+          content : content
+        }
+        $.post('/chat/msg',items).then(()=>{
+          console.log('전송 성공!');
+        });
+      });
+//     });
+  </script>
 </html>

@@ -97,7 +97,7 @@ app.get('/list', function(req,res){
 
     // db애 저장된 post라는 collection안의 데이터 꺼내기
     db.collection('post').find().toArray(function(error,result){
-
+      
       res.render('list.ejs',{posts: result});
 
     });
