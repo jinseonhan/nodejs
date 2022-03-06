@@ -4,6 +4,12 @@ require('dotenv').config();
 const express = require('express');
 const res = require('express/lib/response');
 const app = express();
+
+// socket.io lib
+const http = require('http').createServer(app);
+const {Server} = require('socket.io');
+const io = new Server(http);
+
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
@@ -34,12 +40,33 @@ MongoClient.connect(process.env.DB_URL,function(error,client){
     if(error){
         return console.log("에러발생 이유 : "+error);
     }
-    app.listen(process.env.PORT,function(){
+    http.listen(process.env.PORT,function(){
         console.log("listening on 8080");
     });
 
 //    client.close();
 });
+
+app.get('/socket',function(req,res){
+  res.render('socket.ejs');
+});
+io.on('connection',function(socket){
+  
+  socket.on('joinRoom1',function(data){
+    socket.join('room1');
+  });
+  socket.on('room1-send',function(data){
+    io.to('room1').emit('broadcast',data);
+  });
+  
+  socket.on('user-send',function(data){
+    io.to(socket.id).emit('broadcast',data);
+
+  });
+
+  
+});
+
 
 // return : error check
 function errorCheck(error){
@@ -136,7 +163,9 @@ app.get('/login',function(req,res){
 });
 
 app.post('/login',passport.authenticate('local',{
-    failureRedirect : '/fail' // TODO : 여기에 pwd 5번 틀렸을시 로그인 막기
+    failureRedirect : '/login' // TODO : 여기에 pwd 5번 틀렸을시 로그인 막기
+    ,failureMessage : true
+    ,
 }),function(req,res){
   // TODO : 로그인 로그 기록 저장
   
@@ -156,12 +185,12 @@ passport.use(new LocalStrategy({
     passReqToCallback: false,
   }, function (id, pw, done) {
     //console.log(입력한아이디, 입력한비번);
-    db.collection('login').findOne({ id: id }, function (error, result) {
-      if (error) return done(error)
+    db.collection('login').findOne({ id: id }, function (error, user) {
+      if (error) return done(error);
   
-      if (!result) return done(null, false, { message: '존재하지않는 아이디입니다.' });  // 서버에러, 성공시 사용자 db데이터, 에러메시지 
-      if (crypto.createHash('sha512').update(pw).digest('base64') == result.pw) {
-        return done(null, result);
+      if (!user) return done(null, false, { message: '존재하지않는 아이디입니다.' });  // 서버에러, 성공시 사용자 db데이터, 에러메시지 
+      if (crypto.createHash('sha512').update(pw).digest('base64') == user.pw) {
+        return done(null, user);
       } else {
         return done(null, false, { message: '비번번호를 잘못입력하셨습니다.' });
       }

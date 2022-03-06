@@ -12,27 +12,7 @@
         location.href="/member/registPage";
       });
 
-      // 로그인
-      $("#loginSubmit").on("click",function(){
-        $.ajax({
-            method : 'SELECT'
-            , url : '/login'
-            , data :  $("#loginFrm").serialize()
-            , async : false
-          }).done(function(result){
-            // 1. 로그인 성공 -> 메인페이지
-            // 2. 로그인 실패 -> alert (5회 이상 틀리면 안됨)
-            
-            
-         }).fail(function(xhr, textStatus, errorThrown){
-            // 실패
-            // xhr
-            // textStatus : error code
-            // errorThrown : error msg
-            console.log(xhr, textStatus, errorThrown);
-   
-          });
-      });
+      
     });
     
 
@@ -40,7 +20,7 @@
   <%- include('nav.html')%>
 
   <body>
-    <form name="loginFrm"  id="loginFrm" method="post">
+    <form action="/login" method="post">
       <div class="card mb-3" style="max-width: 540px;">
         <div class="row g-0">
           <div class="col-md-4">

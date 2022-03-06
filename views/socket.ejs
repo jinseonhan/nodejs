@@ -1,0 +1,77 @@
+<html lang="ko">
+  <head>
+  
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" ></script>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+    <title>chatroom</title>
+    <style>
+        .chat-content {
+            height: 450px;
+            overflow-y: scroll;
+            padding: 10px;
+        }
+        .chat-content li {
+            margin-top: 10px;
+            list-style: none;
+        }
+        .text-small {
+            font-size: 12px;
+            color: gray;
+            margin-bottom: 0;
+        }
+        .chat-box {
+            background: #eee;
+            padding: 5px;
+            border-radius: 5px;
+            float: left;
+        }
+        .mine {
+           float: right;
+        } 
+
+    </style>
+
+  </head>
+  <%- include('nav.html')%>
+
+  <body>
+    
+  
+
+    <div class="container p-4 detail">
+        <div>채팅방</div>
+       <input type="text" name="content" id="content"> <button id="send">서버에 메시지 보내기</button>
+
+       <button id ='room1'>room1 입장</button>
+       <button id ='room1-send'>채팅방1에서 메시지 보내기</button>
+       <div id="msg"></div>
+    </div> 
+    <script>
+        var socket = io();
+        $("#send").on("click",function(){
+            var content = $("#content").val();
+            socket.emit('user-send',content);
+            $("#content").val("");
+        });
+
+        socket.on('broadcast',function(data){
+            console.log(data);
+            $("#msg").append('<div>'+data+'</div>');
+        });
+
+        $("#room1").on("click",function(){
+            console.log('room1');
+            socket.emit('joinRoom1','채팅방1입장');
+
+        });
+
+        $("#room1-send").on("click",function(){
+            var content = $("#content").val();
+            socket.emit('room1-send',content);
+            $("#content").val("");
+        });
+    </script>
+  </body>
+ 
+ 
+</html>
