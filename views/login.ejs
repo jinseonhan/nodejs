@@ -11,6 +11,28 @@
       $("#register").on("click",function(){
         location.href="/member/registPage";
       });
+
+      // 로그인
+      $("#loginSubmit").on("click",function(){
+        $.ajax({
+            method : 'SELECT'
+            , url : '/login'
+            , data :  $("#loginFrm").serialize()
+            , async : false
+          }).done(function(result){
+            // 1. 로그인 성공 -> 메인페이지
+            // 2. 로그인 실패 -> alert (5회 이상 틀리면 안됨)
+            
+            
+         }).fail(function(xhr, textStatus, errorThrown){
+            // 실패
+            // xhr
+            // textStatus : error code
+            // errorThrown : error msg
+            console.log(xhr, textStatus, errorThrown);
+   
+          });
+      });
     });
     
 
@@ -18,18 +40,34 @@
   <%- include('nav.html')%>
 
   <body>
-    <form action="/login" method="post">
-        <div class="form-group">
-            <p>아이디</p>
-            <input type="text" class="form-control" name="id"/>
+    <form name="loginFrm"  id="loginFrm" method="post">
+      <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="./image/doge.jpeg" class="img-fluid rounded-start" alt="logo">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">로그인</h5>
+              <div class="form-group">
+                  <p>아이디</p>
+                  <input type="text" class="form-control" name="id"/>
+              </div>
+              <div class="form-group">
+                  <p>패스워드</p>
+                  <input type="password" class="form-control" name="pw"/>
+              </div>
+              <div class="for-group">
+                <input type="submit" class="btn btn-danger" id="loginSubmit" value="로그인"/>
+                <button type="button" id="register" class="btn btn-primary">회원가입</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-            <p>패스워드</p>
-            <input type="password" class="form-control" name="pw"/>
-        </div>
+      </div>
+        
 
-      <input type="submit" class="btn btn-danger" value="로그인"/>
       </form>
-      <button type="button" id="register" class="btn btn-primary">회원가입</button>
+     
     </body>
 </html>
