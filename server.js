@@ -5,6 +5,10 @@ const express = require('express');
 const res = require('express/lib/response');
 const app = express();
 
+// mariadb 연결
+const maria = require('./database/connect/maria');
+maria.connect();
+
 // socket.io lib
 const http = require('http').createServer(app);
 const {Server} = require('socket.io');
@@ -23,15 +27,16 @@ app.use(passport.session());
 var crypto = require('crypto'); // 암호화
 
 
-
-
 app.use(bodyParser.urlencoded({extended:true}));
 app.set('view engine','ejs');
 
 // public 추가(middle ware)
 app.use('/public', express.static('public')); 
 
-// db 설정
+
+
+
+// mongodb 설정
 const MongoClient = require('mongodb').MongoClient;
 MongoClient.connect(process.env.DB_URL,function(error,client){
     // 연결되면 할일
@@ -42,13 +47,14 @@ MongoClient.connect(process.env.DB_URL,function(error,client){
     }
     http.listen(process.env.PORT,function(){
         console.log("listening on 8080");
+       
     });
 
 //    client.close();
 });
 
-app.get('/socket',function(req,res){
-  res.render('socket.ejs');
+app.get('/socketChat',function(req,res){
+  res.render('socketChat.ejs');
 });
 io.on('connection',function(socket){
   
@@ -125,7 +131,6 @@ app.get('/list', function(req,res){
 
     // db애 저장된 post라는 collection안의 데이터 꺼내기
     db.collection('post').find().toArray(function(error,result){
-      
       res.render('list.ejs',{posts: result});
 
     });
@@ -153,7 +158,6 @@ function loginCheck(req,res,next){
         next();
     }else{
         res.send('재 로그인 해주세요.');
-        
     }
 }
 
@@ -176,7 +180,6 @@ app.get('/fail',function(req,res){
     res.render('fail.ejs');
 });
 
-// TODO : 암호화 해야함
 // 로그인 검증 로직
 passport.use(new LocalStrategy({
     usernameField: 'id', // 유저가 입력한 아아디 , 비번 항목이 무엇인지 정의

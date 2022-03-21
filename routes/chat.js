@@ -2,6 +2,8 @@ const { render } = require('express/lib/response');
 
 var router = require('express').Router(); // 라우터 만들때 필수!
 
+const maria = require('../database/connect/maria');
+
 function loginCheck(req,res,next){
     // 로그인 상태 확인
     if(req.user){
@@ -34,15 +36,48 @@ router.get('/message/:parent',function(req,res){
 
     
 });
+// 채팅방 입장
 router.post('/chatroom',function(req,res){
+    var target = req.body.target;
     var data ={
         title : '채팅방1',
-        member : [req.body.target,req.user.id],
+        member : [target,req.user.id],
         date : new Date()
     }
-    db.collection('chatroom').insertOne(data).then((result)=>{
-        res.send('성공!');
+
+    // 판매자와 구매자 기준이기 때문에 대화 상대가 같다고 하더라도 방을 새로 생성해야 한다.
+    db.collection('chatroom').find({member:req.user.id}).toArray().then((result)=>{
+       if(Object.keys(result).length>0){
+            // 기존 데이터가 존재할 때
+            // console.log('기존 데이터 존재');
+
+            // TODO : target과의 대화내용가지고 view로 이동
+
+            res.render('chatMain.ejs',{data : result,target : target});
+       }else{
+            // console.log('기존 데이터 없음');
+            // 기존 데이터가 없을 때
+            db.collection('chatroom').insertOne(data).then((result)=>{
+                     
+                   if(result.acknowledged){
+                       // 성공 
+                       db.collection('chatroom').find({member:req.user.id}).toArray().then((result)=>{
+                           //console.log(result);
+                           res.render('chatMain.ejs',{data : result,target : target});
+                       });
+                   }else{
+                       // 실패
+                       res.send('채팅방 입장 실패!');
+                   }
+           
+            });
+       }
     });
+   
+
+   
+
+
 });
 
 router.get('/chatMain',function(req,res){

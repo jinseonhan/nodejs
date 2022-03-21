@@ -1,6 +1,9 @@
 //const { render } = require('express/lib/response');
 
 var router = require('express').Router(); // 라우터 만들때 필수!
+
+const maria = require('../database/connect/maria');
+
 var crypto = require('crypto'); // 암호화
 
 // 회원 가입페이지
@@ -15,6 +18,16 @@ router.post('/idDuplicateChk',function(req,res){
     var data ={
         id : id,
     }
+    var sql ='select count(user_id) from nodejs.tb_user_pub where user_id=?';
+    
+    maria.query(sql,[id],function(err,rows,fields){ // row : data값(배열로), fields :  data정보
+      if(!err){
+        console.log(rows);
+        if(rows[0]!=undefined){
+
+        }
+      }
+    });
     db.collection('login').find(data).toArray(function(error,result){
       for(var i=0; i<result.length;i++){
         if(result[i].id==id){
