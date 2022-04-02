@@ -17,12 +17,12 @@
     $(document).ready(function(){
       // 아이디 중복체크
       $("#idDuplicateChk").on("click",function(){
-        var userid = $("#id").val();
+        var userid = $("#idChk").val();
           $.ajax({
-            method : 'SELECT'
+            method : 'post'
             , url : '/member/idDuplicateChk'
             , data : {id : userid}
-            , method : 'post'
+            
           }).done(function(result){
             
 
@@ -30,6 +30,7 @@
               // 중복된 아이디가 없을때
               alert("사용가능한 아이디입니다!");
               $("#duplicateResult").val("Y");
+              $("#id").val(userid);
            }else{
               // 중복된 아이디가 존재할 때
               alert("이미 사용중인 아이디입니다!");
@@ -49,19 +50,74 @@
           return false;
         }
         // 2. submit
-        document.submitFrm.method='post';
-        document.submitFrm.action='/member/regist';
+        // document.submitFrm.method='post';
+        // document.submitFrm.action='/member/regist';
+        var data = $('#submitFrm').serialize();
+        
+        $.ajax({
+            method : 'post'
+            , url : '/member/regist'
+            , data :data
+           
+          }).done(function(result){
+            if(result=='success'){
+              // 회원가입 성공
+              alert("회원가입에 성공하였습니다!");
+              location.href="/login";
+            }else{
+              // 회원가입 실패 
+              alert("회원가입에 실패하였습니다!");
+            }
+
+           
+
+         }).fail(function(xhr, textStatus, errorThrown){
+            
+            console.log(xhr, textStatus, errorThrown);
+   
+          });
+
       });
+
+      // id값을 변경하였을 경우 id 재 체크
+      $(".idClass").on('change',function(){
+        $("#duplicateResult").val('N');
+      });
+
     });
 
     // validChk function
     function fnValidChk(){
         var duplicateResult = $("#duplicateResult").val();
-        if(duplicateResult=='N'){
+        if(duplicateResult!='Y'){
           alert("아이디를 중복체크하세요.");
           $("#id").focus();
           return false;
         }
+
+        var pwd =$("#pwd").val();
+        var pwdChk=$("#pwdChk").val();
+
+        if(pwd!=pwdChk){
+          alert("패스워드가 일치하지 않습니다.");
+          $("#pwdChk").focus();
+          return false;
+        }
+
+        var email = $("#email").val();
+        if(email.length==0){
+          alert("email를 입력해주세요.");
+          $("#email").focus();
+          return false;
+        }
+        
+        if(email.indexOf('@') ==-1){
+          alert("email 양식이 아닙니다.");
+          $("#email").focus();
+          return false;
+        }
+
+
         return true;
     }
   </script>
@@ -72,16 +128,22 @@
         
           <div class="form-group">
               <p>아이디</p>
-              <input type="text" id="id" class="form-control" name="id"/>
+              <input type="hidden" class="idClass" id="id" class="form-control" name="id"/>
+              <input type="text" class="idClass" id="idChk" class="form-control"/>
               <button type="button" id="idDuplicateChk" class="btn btn-secondary">중복체크</button>
 
           </div>
           <div class="form-group">
               <p>패스워드</p>
-              <input type="password" class="form-control" name="pw"/>
+              <input type="password" class="form-control" name="pw" id="pwd" />
+              <p>패스워드 확인</p>
+              <input type="password" class="form-control" id="pwdChk"/>
           </div>
-  
-        <button type="submit" class="btn btn-danger" id="submit" value="Submit">회원가입</button>
+          <div class="form-group">
+            <p>이메일</p>
+            <input type="text" class="form-control" id="email" name="email"/>
+          </div>
+        <button type="button" class="btn btn-danger" id="submit" value="Submit">회원가입</button>
         </form>
       </div>
 
