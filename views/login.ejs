@@ -12,15 +12,46 @@
         location.href="/member/registPage";
       });
 
+      $("#loginSubmit").on("click",function(){
+        
+        var data = $("#submitFrm").serialize();
+        //alert(data);
+        $.ajax({
+            method : 'post'
+            , url : '/login'
+            , data :data
+           
+          }).done(function(result){
+            if(result.result=='success'){ 
+              // 로그인 성공
+              
+              location.href="/login";
+            }else{
+              // 로그인 실패 
+              alert(result.message);
+            }
+         }).fail(function(xhr, textStatus, errorThrown){
+            
+            console.log(xhr, textStatus, errorThrown);
+   
+          });
+      });
+
+      
       
     });
-  
+    
+    function press(f){
+      if(f.ketCode==13){
+        submitFrm.submit();
+      }
+    }
 
   </script>
   <%- include('nav.html')%>
 
   <body>
-    <form action="/login" method="post">
+    <form name="submitFrm" id="submitFrm" method="post" onsubmit="return false;">
       <div class="card mb-3" style="max-width: 540px;">
         <div class="row g-0">
           <div class="col-md-4">
@@ -31,14 +62,14 @@
               <h5 class="card-title">로그인</h5>
               <div class="form-group">
                   <p>아이디</p>
-                  <input type="text" class="form-control" name="id"/>
+                  <input type="text" class="form-control" name="id" onkeypress="javascript:press(this.form)"/>
               </div>
               <div class="form-group">
                   <p>패스워드</p>
-                  <input type="password" class="form-control" name="pw"/>
+                  <input type="password" class="form-control" name="pw" onkeypress="javascript:press(this.form)"/>
               </div>
               <div class="for-group">
-                <input type="submit" class="btn btn-danger" id="loginSubmit" value="로그인"/>
+                <button type="button" class="btn btn-danger" id="loginSubmit" >로그인</button>
                 <button type="button" id="register" class="btn btn-primary">회원가입</button>
               </div>
             </div>

@@ -188,21 +188,43 @@ passport.use(new LocalStrategy({
     passReqToCallback: false,
   }, function (id, pw, done) {
     //console.log(입력한아이디, 입력한비번);
-    db.collection('login').findOne({ id: id }, function (error, user) {
-      if (error) return done(error);
-  
-      if (!user) return done(null, false, { message: '존재하지않는 아이디입니다.' });  // 서버에러, 성공시 사용자 db데이터, 에러메시지 
-      if (crypto.createHash('sha512').update(pw).digest('base64') == user.pw) {
-        return done(null, user);
-      } else {
-        return done(null, false, { message: '비번번호를 잘못입력하셨습니다.' });
+    var userId = id;
+    var userPwd = crypto.createHash('sha512').update(pw).digest('base64');
+
+    //console.log("id : "+ userId);
+    //console.log("pwd : "+ userPwd);
+    var sql = 'SELECT USER_ID as userId,USER_PWD as userPwd FROM nodejs.tb_user_pub WHERE USER_ID = ? AND USER_PWD = ?';
+    maria.query(sql,[userId,userPwd],function(err,result){ // row : data값(배열로), fields :  data정보
+      
+      if(!err){
+        //console.log(rows);
+        //console.log(result);
+        if(result.length===0){
+          return done(null,false, {message : '일치하는 정보가 없습니다,',result : 'fail'});
+        }else{
+          return done(null,{result : 'success'});
+        }
       }
-    })
+
+
+
+
+    // db.collection('login').findOne({ id: id }, function (error, user) {
+    //   if (error) return done(error);
+  
+    //   if (!user) return done(null, false, { message: '존재하지않는 아이디입니다.' });  // 서버에러, 성공시 사용자 db데이터, 에러메시지 
+    //   if (crypto.createHash('sha512').update(pw).digest('base64') == user.pw) {
+    //     return done(null, user);
+    //   } else {
+    //     return done(null, false, { message: '비번번호를 잘못입력하셨습니다.' });
+    //   }
+    });
   }));
 
 
   // 로그인 성공 (세션)
   passport.serializeUser(function(user, done){
+    console.log(user);
     done(null, user.id);
   });
   // 로그인 관련 (세션) 정보 해석

@@ -60,7 +60,7 @@
             , data :data
            
           }).done(function(result){
-            if(result=='success'){
+            if(result=='success'){ 
               // 회원가입 성공
               alert("회원가입에 성공하였습니다!");
               location.href="/login";
@@ -68,9 +68,6 @@
               // 회원가입 실패 
               alert("회원가입에 실패하였습니다!");
             }
-
-           
-
          }).fail(function(xhr, textStatus, errorThrown){
             
             console.log(xhr, textStatus, errorThrown);
@@ -124,7 +121,7 @@
   <body>
       <div class="container mt-4">
         <input type="hidden" name="duplicateResult" id="duplicateResult" value="N">
-        <form id="submitFrm" name="submitFrm" method="post">
+        <form id="submitFrm" name="submitFrm" method="post" onsubmit="return false;">
         
           <div class="form-group">
               <p>아이디</p>
