@@ -223,15 +223,15 @@ passport.use(new LocalStrategy({
   }));
 
 
-  // 로그인 성공 (세션)
+  // 로그인 성공시 세션에 id저장 (세션)
   passport.serializeUser(function(user, done){
     //console.log(user);
     // console.log(user.userId);
     // console.log("loginSuccess : "+user);
     done(null, user.userId);
   });
-  // 로그인 관련 (세션) 정보 해석
-  passport.deserializeUser(function(id,done){ // 세션에 담긴 id
+  // 로그인 여부 확인 (세션에 저장된 id를 가지고 로그인 여부 확인)
+  passport.deserializeUser(function(id,done){ // id : 세션에 담긴 id(id를 이용하여 로그인 확인)
     var sql = 'SELECT USER_ID as userId FROM nodejs.tb_user_pub WHERE USER_ID = ?';
     maria.query(sql,[id],function(err,rows,fields){ // row : data값(배열로), fields :  data정보
       done(null,rows[0]);
