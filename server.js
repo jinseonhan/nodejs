@@ -115,9 +115,9 @@ app.get('/', function(req,res){
     res.render('index.ejs');
 });
 
-app.get('/pet', function(req,res){
-    res.send('반갑습니다.');
-});
+// app.get('/pet', function(req,res){
+//     res.send('반갑습니다.');
+// });
 
 app.get('/write', function(req,res){
     res.render('write.ejs');
@@ -225,14 +225,18 @@ passport.use(new LocalStrategy({
 
   // 로그인 성공 (세션)
   passport.serializeUser(function(user, done){
-    console.log(user);
+    //console.log(user);
     // console.log(user.userId);
     // console.log("loginSuccess : "+user);
     done(null, user.userId);
   });
   // 로그인 관련 (세션) 정보 해석
-  passport.deserializeUser(function(user,done){ // 세션에 담긴 id
-    done(null,user);
+  passport.deserializeUser(function(id,done){ // 세션에 담긴 id
+    var sql = 'SELECT USER_ID as userId FROM nodejs.tb_user_pub WHERE USER_ID = ?';
+    maria.query(sql,[id],function(err,rows,fields){ // row : data값(배열로), fields :  data정보
+      done(null,rows[0]);
+    });
+    
     // db에서 위의 user.id로 유저를 찾은 뒤에 유저 정보를 {}에 넣음
     // db.collection('login').findOne({id:id},function(error,result){
         // done(null,result); 

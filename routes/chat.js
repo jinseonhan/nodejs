@@ -6,6 +6,7 @@ const maria = require('../database/connect/maria');
 
 function loginCheck(req,res,next){
     // 로그인 상태 확인
+    // console.log(req);
     if(req.user){
         next();
     }else{
