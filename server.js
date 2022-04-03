@@ -119,23 +119,9 @@ app.get('/', function(req,res){
 //     res.send('반갑습니다.');
 // });
 
-app.get('/write', function(req,res){
-    res.render('write.ejs');
-});
 
 
 
-// EJS사용(jstl과 비슷)
-// get 요청 : /list 로 접속하면 html에서 db의 데이터를 보여줌
-app.get('/list', function(req,res){
-
-    // db애 저장된 post라는 collection안의 데이터 꺼내기
-    db.collection('post').find().toArray(function(error,result){
-      res.render('list.ejs',{posts: result});
-
-    });
- 
-});
 
 
 
@@ -243,42 +229,7 @@ passport.use(new LocalStrategy({
     // });
   });
 
-  app.post('/add', (req,res)=>{    
-    db.collection('counter').findOne({name: '게시물갯수'},function(error,result){
-        let title = req.body.title;
-        let date = req.body.date;
-        let register = req.user.id;
-    
-        let totalPost = result.totalPost;
-        db.collection('post').insertOne({_id:totalPost+1, title : title, date : date, regUser : register },function(error,result){
-            db.collection('counter').updateOne({name:'게시물갯수'},{$inc:{totalPost:+1}},function(error,result){
-                // 콜백함수
-                if(error){return console.log(error);}
-
-
-            });
-        });
-    });
- 
-    res.send("전송완료"); 
-   
-  });
-app.delete('/delete',function(req,res){
-    // 요청.body에 담겨온 게시물번호를 가진 글을 db에서 찾아서 삭제 
-    var deleteData = {_id : parseInt(req.body._id), regUser : req.user.id}    
-    
-    db.collection('post').deleteOne(deleteData,function(error,result){
-        // console.log('삭제완료');
-        // 200, 400, 500 에러 분기처리해야 함
-        // if(result) {console.log(result)}
-        res.status(200).send({message: 'success', error:error});
-
-        // res.status(400).send({message: 'success', error:error}); // 에러는 값을 전송할 수 없음.
-
-    });
-
-});
- 
+  
  
 
 
@@ -356,7 +307,7 @@ app.delete('/delete',function(req,res){
   
 
   app.use('/shop',require('./routes/shop.js')); // node.js 에서는 server.js의 현재경로에서 부터 시작하는것이 국룰이란다.
-  app.use('/board/sub',require('./routes/board.js')); 
+  app.use('/board/sub',require('./routes/board_temp.js')); 
   app.use('/chat',require('./routes/chat.js'));
   app.use('/member',require('./routes/member.js')); 
-  
+  app.use('/board',require('./routes/board.js'));

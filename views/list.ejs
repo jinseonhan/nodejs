@@ -13,6 +13,7 @@
       <div class="container input-group mb-2">
         <input type="text" class="form-control" id="keyword">
         <button class="input-group-append btn btn-danger" id="search">검색</button>
+        <button class="input-group-append btn btn-primary" id="write">글쓰기</button>
       </div>
       <div class="container">
         <ul class="list-group">
@@ -63,6 +64,10 @@
         window.location.replace('/search?value='+$("#keyword").val());
        });
        
+       // 글쓰기
+       $('#write').on('click',function(){
+        location.href="/board/write";
+       });
        // 채팅하기
       
         // $('.chat').click(function(e){
