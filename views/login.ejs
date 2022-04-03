@@ -22,13 +22,14 @@
             , data :data
            
           }).done(function(result){
-            if(result.result=='success'){ 
+            //console.log("result"+result);
+            if(result==='success'){ 
               // 로그인 성공
               
-              location.href="/login";
+              location.href="/";
             }else{
               // 로그인 실패 
-              alert(result.message);
+              alert("로그인에 실패하였습니다.");
             }
          }).fail(function(xhr, textStatus, errorThrown){
             
