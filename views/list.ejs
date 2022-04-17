@@ -1,6 +1,16 @@
 <!doctype html>
   <head>
-   
+   <style>
+     .heard {
+        max-width: 5%;
+        height: auto;
+     }
+
+     .caption{
+      border : 2px solid black;
+     }
+
+   </style>
     <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="/public/main.css">
     <title>Hello, world!</title>
@@ -15,21 +25,43 @@
         <button class="input-group-append btn btn-danger" id="search">검색</button>
         <button class="input-group-append btn btn-primary" id="write">글쓰기</button>
       </div>
-      <div class="container">
-        <ul class="list-group">
-          <% for(var i=0;i < posts.length;i++){ %>
-            <li class="list-group-item">
-                <h4><%=posts[i].title %></h4> <!-- 제목 --> 
-                <p><%=posts[i].date %> </p><!-- 작성일 -->
-                <p>작성자 : <%=posts[i].regUser %></p> <!-- 작성자 -->
-                <button class="btn btn-danger delete" data-id="<%=posts[i]._id %>">삭제</button>
-                <button class="btn btn-danger edite" data-id="" onclick="editPage('<%=posts[i]._id %>');">수정</button>          
-                <!-- <button type="button" class="btn btn-warning"  onclick="chatPage('<%=posts[i]._id %>');">채팅하기</button> -->
-                <button type="button" class="btn btn-warning chat"  data-id="<%= posts[i].regUser%>">채팅하기</button>
-            </li>
-          <%} %>
-        </ul>
+      <div class="row">
+        <% for(var i=0;i < listResult.length;i++){%>
+        <div class="col-sm-6 col-md-4">
+          <div class="thumbnail">
+            <div class="caption">
+              <h3><%=listResult[i].title %></h3><!-- 제목 -->
+              <p>카테고리 / 작성일 / 작성자 / 좋아요 갯수</p>
+              <p>
+                <% if(favResult.length>0){ %>
+                  <% for(var j=0;j < favResult.length;j++){ %>
+                      <% if(favResult[j].boardSeq==listResult[i].boardSeq){ %>
+                          <div class="red_heart" data-id="<%= listResult[i].boardSeq %>">
+                              <img src="../public/image/red_heart.png" class="heard" alt="fav">
+                          </div>  
+                    <% break; %>
+                    <% }else{ %>
+                           <div class="empty_heart" data-id="<%= listResult[i].boardSeq %>">
+                              <img src="../public/image/empty_heart.png" class="heard" alt="notFav">
+                          </div>
+  
+                    <% } %>
+                  <% } %>
+                <% }else{ %>
+                       <div class="empty_heart" data-id="<%= listResult[i].boardSeq %>">
+                          <img src="../public/image/empty_heart.png" class="heard" alt="notFav">
+                       </div>
+  
+                <% } %>
+              </p>
+            </div>
+          </div>
+        </div>
+        <% } %>
       </div>
+      
+      
+
       <form method="post" id="submitForm" name="submitForm">
         <input type="hidden" name="targetId" id="targetId">
       </form>
@@ -95,10 +127,40 @@
         });
 
 
+        // 좋아요 버튼
+        $(".empty_heart").on("click",function(){
+            // console.log("좋아요 클릭");
+            favController($(this).data("id"),"fav");
+
+        });
+
+        // 좋아요 취소 버튼
+        $(".red_heart").on("click",function(){
+            // console.log("좋아요 취소 클릭");
+            favController($(this).data("id"),"cancel");
+        });
+
+
+        // 좋아요 컨트롤러
+        function favController(boardSeq,param){
+          $.ajax({
+              method : 'post'
+              , url : '/board/fav'
+              , data : {boardSeq : boardSeq, param:param}
+          }).done(function(result){
+            // 성공
+           
+
+         }).fail(function(xhr, textStatus, errorThrown){
+              // 실패
+              // xhr
+              // textStatus : error code
+              // errorThrown : error msg
+              console.log(xhr, textStatus, errorThrown);
     
-
-
-
+          });
+        
+        }
 
       </script>
       
