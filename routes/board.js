@@ -34,7 +34,7 @@ router.get('/list', function(req,res){
         if(!err){
             if(result.length>0){
                 // 나의 좋아요 리스트
-                var selectSql2 = 'select board_seq as boardSeq from nodejs.tb_board_favorite where favorite_name =?'; 
+                var selectSql2 = 'select board_seq as boardSeq,fav as fav from nodejs.tb_board_favorite where favorite_name =?'; 
                 maria.query(selectSql2,params,function(err2,result2){
                       if(!err2){
                         res.render('list.ejs',{listResult:result,favResult:result2});
@@ -135,7 +135,7 @@ router.delete('/delete',function(req,res){
 });
 
 // 좋아요 클릭
-router.post('/fav', function(req,res){
+router.post('/fav', function(req,res,next){
     var userId=req.user.userId;
     var param=req.body.param; // 좋아요 취소/추가
     var boardSeq=req.body.boardSeq; 
@@ -153,22 +153,18 @@ router.post('/fav', function(req,res){
                 maria.query(insertSql,params2,function(err,rows,fields){
                     console.log("insert");
                     console.log(rows);
-                    console.log(fields);
-                    if(!err){
-                        
-                        res.writeHead(200,{'Content-Type':'text/html; charset=utf-8;'});
-                        if(rows.affectedRows>0){
-                            // 글 작성 성공!
-                            
-                            res.write("<script>alert('좋아요 완료!');location.href='/board/list';</script>");
-                            
-                            
-                           // res.render('list.ejs');
-                        }else{
-                          
-                          res.write("<script>alert('좋아요 실패!');</script>");
-                        }
+                    console.log(rows.affectedRows);
+                    //console.log(fields);
+                    
+                    if(err){
+                        res.send({message: 'fail'});
+
+                        return next(err);
                       }
+
+                        res.send({message: "succes"});
+                      
+                      
                 });
             }else{
                 // 기존 데이터가 있을 때는 update 처리
@@ -178,19 +174,14 @@ router.post('/fav', function(req,res){
                     console.log("update");
                     console.log(rows);
                     console.log(fields);
-                    if(!err){
-                       
-                        res.writeHead(200,{'Content-Type':'text/html; charset=utf-8;'});
-                        if(rows.affectedRows>0){
-                            // update 성공!
-                            
-                            res.write("<script>alert('좋아요 완료!');location.href='/board/list';</script>");                            
-                            
-                        }else{
-                            // update 실패!
-                          res.write("<script>alert('좋아요 실패!');</script>");
-                        }
+                    if(err){
+                        res.send({message: 'fail'});
+
+                        return next(err);
                       }
+
+                        res.send({message:"success"});
+                      
                 });
             }
            
