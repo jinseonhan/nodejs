@@ -28,7 +28,7 @@ router.get('/list', function(req,res){
     // });
     var params = [userId, userId];
     // 내가쓴 글을 제외한 전체 리스트
-    var selectSql1 = 'select board_seq as boardSeq, title as title, view_count as viewCount, reg_id as reqId, favorite_count as favoriteCount, upt_dt as uptDt from nodejs.tb_user_board where reg_id <> ? order by	upt_dt desc';
+    var selectSql1 = 'select B.fav as fav,	A.board_seq as boardSeq,	A.title as title,	A.view_count as viewCount,	A.reg_id as regId, A.favorite_count as favoriteCount, DATE_FORMAT( A.upt_dt, "%Y-%m-%d") as uptDt from nodejs.tb_user_board A left join ( select board_seq, count(fav) as fav from nodejs.tb_board_favorite group by board_seq )B on A.board_seq = B.board_seq where A.reg_id <> ? order by A.upt_dt desc;';
     
     maria.query(selectSql1,params,function(err,result){
         if(!err){
@@ -140,21 +140,21 @@ router.post('/fav', function(req,res,next){
     var param=req.body.param; // 좋아요 취소/추가
     var boardSeq=req.body.boardSeq; 
     var params =[boardSeq,userId];
-    console.log("back");
+    // console.log("back");
     var selectSql = 'select count(*) as cnt from nodejs.tb_board_favorite where board_seq =? and favorite_name =?';
     maria.query(selectSql,params,function(err,result){
-        console.log("select");
+        // console.log("select");
         if(!err){
             if(result[0].cnt < 1){
                 // 기존 데이터가 없을 때는 insert 처리
                 var params2 = [boardSeq,userId,param,userId,userId];
-                console.log(params2);
+                // console.log(params2);
                 var insertSql = 'insert into nodejs.tb_board_favorite(board_seq, favorite_name, fav, reg_dt, reg_id, upt_dt, upt_id) values(?,?,?,now(),?,now(),?)';
                 maria.query(insertSql,params2,function(err,rows,fields){
-                    console.log("insert");
-                    console.log(rows);
-                    console.log(rows.affectedRows);
-                    //console.log(fields);
+                    // console.log("insert");
+                    // console.log(rows);
+                    // console.log(rows.affectedRows);
+                    // //console.log(fields);
                     
                     if(err){
                         res.send({message: 'fail'});
@@ -171,9 +171,9 @@ router.post('/fav', function(req,res,next){
                 var params3 = [boardSeq,userId,param,userId,boardSeq,userId];
                 var updateSql = 'update nodejs.tb_board_favorite set board_seq = ?, favorite_name = ?, fav = ? ,upt_dt=now(), upt_id = ? where board_seq=? and favorite_name=?';
                 maria.query(updateSql,params3,function(err,rows,fields){
-                    console.log("update");
-                    console.log(rows);
-                    console.log(fields);
+                    // console.log("update");
+                    // console.log(rows);
+                    // console.log(fields);
                     if(err){
                         res.send({message: 'fail'});
 
@@ -194,5 +194,12 @@ router.post('/fav', function(req,res,next){
     
 });
 
+// 게시판 상세보기
+router.post('/detail', function(req,res,next){
+    var userId=req.user.userId;
+    var boardSeq = req.body.boardSeq;
+
+
+});
 
 module.exports = router; // module.exports = 내보낼 변수명
