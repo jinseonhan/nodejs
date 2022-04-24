@@ -1,9 +1,30 @@
 const { render } = require('express/lib/response');
-
 var router = require('express').Router(); // 라우터 만들때 필수!
 
 const maria = require('../database/connect/maria');
+let multer = require('multer');
+const path = require('path');
+const storage = multer.diskStorage({
+    destination : function(req,file,cb){
+        cb(null, './public/image'); // 파일경로 설정
+    },
+    filename : function(req,file,cb){
+        let newFileName = new Date().valueOf()+path.extname(file.originalname);
+        cb(null,newFileName); // 파일명 설정
+    },
+    filefilter : function (req, file, callback) { // 확장자 제한
+          var ext = path.extname(file.originalname);
+          if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
+              return callback(new Error('PNG, JPG만 업로드하세요'));
+          }
+          callback(null, true);
+    },
+    limits:{ // 파일사이즈 제한
+      fileSize: 1024 * 1024
+  }
+}); // ROM에 저장
 
+var upload = multer({storage:storage});
 function loginCheck(req,res,next){
     // 로그인 상태 확인
     // console.log(req);
@@ -54,17 +75,17 @@ router.get('/write', function(req,res){
     res.render('write.ejs');
 });
 
-router.post('/boardAdd', (req,res)=>{   
-    var seq;
-    var seqSql = 'select nextval(nodejs.sq_user_board) as seq from dual';
+router.post('/boardAdd', upload.single('image'),(req,res)=>{   
+    var boardSeq;
+    var seqSql = 'select nextval(nodejs.sq_user_board) as boardSeq from dual';
     maria.query(seqSql,function(err,rows,fields){
-        seq = rows[0].seq;
+        boardSeq = rows[0].boardSeq;
         var userId=req.user.userId;
         var title=req.body.title;
         var category = req.body.category;
         var content = req.body.content;
         var params =[
-            seq,
+            boardSeq,
             title,
             content,
             category,
@@ -72,49 +93,33 @@ router.post('/boardAdd', (req,res)=>{
             userId
           ];
         var insertSql = 'INSERT INTO nodejs.tb_user_board(board_seq,title,content,category,reg_dt,reg_id,upt_dt,upt_id) values(?,?,?,?,now(),?,now(),?)';
-        maria.query(insertSql,params,function(err,rows,fields){
+        maria.query(insertSql,params,function(err,rows,fields){  // board table insert
+
             if(!err){
-                //console.log(rows);
-                // console.log(rows[0].idCount);
-                // res.send('success');
-                res.writeHead(200,{'Content-Type':'text/html; charset=utf-8;'});
-                if(rows.affectedRows>0){
-                    // 글 작성 성공!
                     
-                    res.write("<script>alert('글 작성 완료!');location.href='/board/list';</script>");
-                    
-                    
-                   // res.render('list.ejs');
-                }else{
-                  
-                  res.write("<script>alert('글 작성 실패!');</script>");
-                }
+                    // console.log(req.file);
+                    var originalname = req.file.originalname;
+                    var filename = req.file.filename;
+                    var fileParam = [boardSeq,originalname,filename,userId,userId];
+                    var fileInsertQuery = "insert into nodejs.tb_file_list(board_seq, file_origin_name, file_name,del_yn, reg_dt, reg_id, upt_dt,upt_id) values(?,?,?,'N',now(),?,now(),?)";
+                    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8;'});
+                    maria.query(fileInsertQuery,fileParam,function(err,rows,fields){
+                        if(!err){
+                            res.write("<script>alert('글 작성 완료!');location.href='/board/list';</script>");
+                               
+                        }else{
+                            res.write("<script>alert('글 작성 실패!');</script>");
+
+                        } 
+                    });
+
+                
               }
         });
        
+
     });
-    
-    // db.collection('counter').findOne({name: '게시물갯수'},function(error,result){
-    //     let title = req.body.title;
-
-
-
-
-    
-    //     let date = req.body.date;
-    //     let register = req.user.id;
-    
-    //     let totalPost = result.totalPost;
-    //     db.collection('post').insertOne({_id:totalPost+1, title : title, date : date, regUser : register },function(error,result){
-    //         db.collection('counter').updateOne({name:'게시물갯수'},{$inc:{totalPost:+1}},function(error,result){
-    //             // 콜백함수
-    //             if(error){return console.log(error);}
-
-
-    //         });
-    //     });
-    // });
- 
+   
     
    
   });

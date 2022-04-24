@@ -263,12 +263,16 @@ passport.use(new LocalStrategy({
 
 
   let multer = require('multer');
-  var storage = multer.diskStorage({
+  // const { path } = require('express/lib/application');
+  const path = require('path');
+  const storage = multer.diskStorage({
+
       destination : function(req,file,cb){
         cb(null, './public/image'); // 파일경로 설정
       },
       filename : function(req,file,cb){
-        cb(null,file.originalname); // 파일명 설정
+        let newFileName = new Date().valueOf()+path.extname(file.originalname);
+        cb(null,newFileName); // 파일명 설정
       },
       filefilter : function (req, file, callback) { // 확장자 제한
             var ext = path.extname(file.originalname);
@@ -291,6 +295,7 @@ passport.use(new LocalStrategy({
   });
 // npm install multer 라이브러리 적용
   app.post('/upload', upload.single('profile'), function(req,res){
+    console.log(req.file);
     res.send('파일 업로드 완료');
   });
     // app.post('/upload', upload.array('profile',10), function(req,res){

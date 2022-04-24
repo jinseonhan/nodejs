@@ -1,4 +1,4 @@
-//const { render } = require('express/lib/response');
+const { render } = require('express/lib/response');
 
 var router = require('express').Router(); // 라우터 만들때 필수!
 

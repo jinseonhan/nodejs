@@ -196,7 +196,6 @@
               // 좋아요 숫자 늘렸다가 줄였다가 (param이 'Y'일 경우는 + , 'N'일 경우는 - )
               var inputHtml ="";
               document.querySelectorAll(".favCount").forEach(function(e){
-                 console.dir(e);
                   if(e.dataset.id==boardSeq){
                      inputHtml = e.innerText;
                      var inputArr = inputHtml.split("/");
