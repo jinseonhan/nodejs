@@ -10,6 +10,9 @@
       border : 2px solid black;
      }
 
+     .list{
+       float: left;
+     }
    </style>
     <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="/public/main.css">
@@ -25,46 +28,52 @@
         <button class="input-group-append btn btn-danger" id="search">검색</button>
         <button class="input-group-append btn btn-primary" id="write">글쓰기</button>
       </div>
-      <div class="row">
-        <% for(var i=0;i < listResult.length;i++){%>
-        <div class="col-sm-6 col-md-4">
-          <div class="thumbnail">
-            <div class="caption">
-              <h3 class="detail"><%=listResult[i].title %></h3><!-- 제목 -->
-              <p><%=listResult[i].categoryName %> </p>
-              
-                  <div class="case">
-                  <% var result = false; %>
-                  <% for(var j=0;j < favResult.length;j++){ %>
-                      <% if(favResult[j].boardSeq==listResult[i].boardSeq && favResult[j].fav=='Y'){ %>
-                          <% result = true; %>   
-                          <% break; %>                       
-                      <% } %>
+     
+      
+      <% for(var i=0;i < listResult.length;i++){%>
+        <div class="card mb-3" style="max-width: 540px;">
+          <div class="row g-0">
+            <div class="col-md-4">
+              <%if(listResult[i].fileName !=null){ %>
+                <img src="../public/image/<%= listResult[i].fileName %>" class="img-fluid rounded-start"/>
+              <%} %>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h3 class="detail"><%=listResult[i].title %></h3><!-- 제목 -->
+                <p><%=listResult[i].categoryName %> </p>
+                
+                    <div class="case">
+                    <% var result = false; %>
+                    <% for(var j=0;j < favResult.length;j++){ %>
+                        <% if(favResult[j].boardSeq==listResult[i].boardSeq && favResult[j].fav=='Y'){ %>
+                            <% result = true; %>   
+                            <% break; %>                       
+                        <% } %>
+                    <% } %>
+                    <% if(result){ %>
+                      <div class="red_heart" data-id="<%= listResult[i].boardSeq %>">
+                        <img src="../public/image/red_heart.png" class="heard" alt="favY">                   
+                      </div>
+                    <% }else{ %>
+                      <div class="empty_heart" data-id="<%= listResult[i].boardSeq %>">
+                        <img src="../public/image/empty_heart.png" class="heard" alt="favN">
+                      </div>
                   <% } %>
-                  <% if(result){ %>
-                    <div class="red_heart" data-id="<%= listResult[i].boardSeq %>">
-                      <img src="../public/image/red_heart.png" class="heard" alt="favY">                   
-                    </div>
-                  <% }else{ %>
-                    <div class="empty_heart" data-id="<%= listResult[i].boardSeq %>">
-                      <img src="../public/image/empty_heart.png" class="heard" alt="favN">
-                    </div>
-                 <% } %>
-                </div>
-              
-                <div class="favCount" data-id="<%= listResult[i].boardSeq %>">
-                  <% if(listResult[i].fav == 0 || listResult[i].fav== null){ %>
-                  0
-                  <% }else{ %>
-                  <%= listResult[i].fav %>
-                  <%} %> / <%= listResult[i].regId %> / <%= listResult[i].uptDt %>
-                </div>
+                  </div>
+                
+                  <div class="favCount" data-id="<%= listResult[i].boardSeq %>">
+                    <% if(listResult[i].fav == 0 || listResult[i].fav== null){ %>
+                    0
+                    <% }else{ %>
+                    <%= listResult[i].fav %>
+                    <%} %> / <%= listResult[i].regId %> / <%= listResult[i].uptDt %>
+                  </div>
+              </div>
             </div>
           </div>
         </div>
-        <% } %>
-      </div>
-      
+      <% } %>
       
 
       <form method="post" id="submitForm" name="submitForm">

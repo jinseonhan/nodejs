@@ -49,7 +49,7 @@ router.get('/list', function(req,res){
     // });
     var params = [userId, userId];
     // 내가쓴 글을 제외한 전체 리스트
-    var selectSql1 = 'select B.fav as fav,	A.board_seq as boardSeq,A.title as title,	A.view_count as viewCount,A.reg_id as regId,	A.favorite_count as favoriteCount,	DATE_FORMAT( A.upt_dt, "%Y-%m-%d") as uptDt, C.category_name as categoryName	from	nodejs.tb_user_board A left join (	select		board_seq,		count(fav) as fav from		nodejs.tb_board_favorite group by		board_seq )B on	A.board_seq = B.board_seq left JOIN 	(select 		category_seq,		category_name,		category_comment from	nodejs.tb_board_category) C	on A.category = C.category_seq  where A.reg_id <> ? order by A.upt_dt desc;';
+    var selectSql1 = 'select B.fav as fav,	A.board_seq as boardSeq,A.title as title,	A.view_count as viewCount,A.reg_id as regId,	A.favorite_count as favoriteCount,	DATE_FORMAT( A.upt_dt, "%Y-%m-%d") as uptDt, C.category_name as categoryName, D.file_seq as fileSeq, D.file_name as fileName 	from	nodejs.tb_user_board A left join (	select		board_seq,		count(fav) as fav from		nodejs.tb_board_favorite group by		board_seq )B on	A.board_seq = B.board_seq left JOIN 	(select 		category_seq,		category_name,		category_comment from	nodejs.tb_board_category) C	on A.category = C.category_seq left join (select file_seq, board_seq, file_name from nodejs.tb_file_list) D on	A.board_seq = D.board_seq  where A.reg_id <> ? order by A.upt_dt desc;';
     
     maria.query(selectSql1,params,function(err,result){
         if(!err){
