@@ -49,7 +49,7 @@ router.get('/list', function(req,res){
     // });
     var params = [userId, userId];
     // 내가쓴 글을 제외한 전체 리스트
-    var selectSql1 = 'select B.fav as fav,	A.board_seq as boardSeq,A.title as title,	A.view_count as viewCount,A.reg_id as regId,	A.favorite_count as favoriteCount,	DATE_FORMAT( A.upt_dt, "%Y-%m-%d") as uptDt, C.category_name as categoryName, D.file_seq as fileSeq, D.file_name as fileName 	from	nodejs.tb_user_board A left join (	select		board_seq,		count(fav) as fav from		nodejs.tb_board_favorite group by		board_seq )B on	A.board_seq = B.board_seq left JOIN 	(select 		category_seq,		category_name,		category_comment from	nodejs.tb_board_category) C	on A.category = C.category_seq left join (select file_seq, board_seq, file_name from nodejs.tb_file_list) D on	A.board_seq = D.board_seq  where A.reg_id <> ? order by A.upt_dt desc;';
+    var selectSql1 = 'select B.fav as fav,	A.board_seq as boardSeq,A.title as title,	A.view_count as viewCount,A.reg_id as regId,	A.favorite_count as favoriteCount,	DATE_FORMAT( A.upt_dt, "%Y-%m-%d") as uptDt, C.category_name as categoryName, D.file_seq as fileSeq, D.file_name as fileName 	from	nodejs.tb_user_board A left join (	select		board_seq,		count(fav) as fav from		nodejs.tb_board_favorite group by		board_seq )B on	A.board_seq = B.board_seq left JOIN 	(select 		category_seq,		category_name,		category_comment from	nodejs.tb_board_category) C	on A.category = C.category_seq left join (select file_seq, board_seq, file_name from nodejs.tb_file_list) D on	A.board_seq = D.board_seq  where A.reg_id <> ? order by A.upt_dt desc';
     
     maria.query(selectSql1,params,function(err,result){
         if(!err){
@@ -72,7 +72,19 @@ router.get('/list', function(req,res){
 });
 
 router.get('/write', function(req,res){
-    res.render('write.ejs');
+    var categoryList;
+
+    var selectCategoryList ='select category_seq as categorySeq, category_name as categoryName  from nodejs.tb_board_category';
+    // 카테고리 리스트 불러오기
+    maria.query(selectCategoryList,function(err,result){
+       if(!err){
+        categoryList =  result;
+        
+        res.render('write.ejs',{categoryList:categoryList});
+       }
+        
+    });
+    
 });
 
 router.post('/boardAdd', upload.single('image'),(req,res)=>{   
@@ -199,12 +211,26 @@ router.post('/fav', function(req,res,next){
     
 });
 
-// 게시판 상세보기
-router.post('/detail', function(req,res,next){
-    var userId=req.user.userId;
-    var boardSeq = req.body.boardSeq;
+// 리스트 상세보기
+router.get('/detail/:boardSeq', function(req,res){
+    var categoryList;
 
-
+    var selectCategoryList ='select category_seq as categorySeq, category_name as categoryName  from nodejs.tb_board_category';
+    // 카테고리 리스트 불러오기
+    maria.query(selectCategoryList,function(err,result){
+       categoryList =  result;
+        
+    });
+    
+    var boardSeq = req.params.boardSeq;
+    var selectSql = 'select A.category as category, D.file_origin_name as fileOriginName,A.content as content, B.fav as fav,	A.board_seq as boardSeq,A.title as title,	A.view_count as viewCount,A.reg_id as regId,	A.favorite_count as favoriteCount,	DATE_FORMAT( A.upt_dt, "%Y-%m-%d") as uptDt, C.category_name as categoryName, D.file_seq as fileSeq, D.file_name as fileName 	from	nodejs.tb_user_board A left join (	select		board_seq,		count(fav) as fav from		nodejs.tb_board_favorite group by		board_seq )B on	A.board_seq = B.board_seq left JOIN 	(select 		category_seq,		category_name,		category_comment from	nodejs.tb_board_category) C	on A.category = C.category_seq left join (select file_seq, board_seq, file_name,file_origin_name from nodejs.tb_file_list) D on	A.board_seq = D.board_seq  where A.board_Seq = ? ';
+    maria.query(selectSql,boardSeq,function(err,result){
+        if(!err){
+            res.render('detail.ejs',{data:result,categoryList:categoryList});
+        }
+        
+    });
+    
 });
 
 module.exports = router; // module.exports = 내보낼 변수명

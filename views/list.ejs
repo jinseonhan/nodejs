@@ -31,11 +31,13 @@
      
       
       <% for(var i=0;i < listResult.length;i++){%>
-        <div class="card mb-3" style="max-width: 540px;">
-          <div class="row g-0">
+        <div class="card mb-3" style="max-width: 540px;" >
+          <div class="row g-0" >
             <div class="col-md-4">
               <%if(listResult[i].fileName !=null){ %>
-                <img src="../public/image/<%= listResult[i].fileName %>" class="img-fluid rounded-start"/>
+                <img src="../public/image/<%= listResult[i].fileName %>" class="img-fluid rounded-start" data-id="<%= listResult[i].boardSeq %>"/>
+              <%}else{ %>
+                <img src="../public/image/default_img.png" class="img-fluid rounded-start" data-id="<%= listResult[i].boardSeq %>"/>
               <%} %>
             </div>
             <div class="col-md-8">
@@ -102,9 +104,7 @@
           });
         });
         
-       function editPage(id){
-          location.href="/editPage/"+id;
-       }
+     
 
        $("#search").on("click",function(){
         window.location.replace('/search?value='+$("#keyword").val());
@@ -234,6 +234,10 @@
         
         }
 
+        $(document).on("click",".rounded-start",function(){
+            var boardSeq = ($(this).data("id"));
+            location.href="/board/detail/"+boardSeq;
+        });
       </script>
       
 
