@@ -36,6 +36,22 @@ function loginCheck(req,res,next){
     }
 }
 
+// 파일 저장시 날짜 형식 변환
+Date.prototype.YYYYMMDD= function(){
+    let yyyy = this.getFullYear().toString();
+    let MM = pad(this.getMonth()+1,2);
+    let dd = pad(this.getDate(),2);
+   
+    return yyyy+"-"+MM+"-"+dd;
+}
+
+function pad(number, length){
+    let str = '' +number;
+    while(str.length <length){
+        str = '0' + str;
+    }
+    return str;
+}
 router.use(loginCheck);
 
 // EJS사용(jstl과 비슷)
@@ -86,8 +102,10 @@ router.get('/write', function(req,res){
     });
     
 });
-
-router.post('/boardAdd', upload.single('image'),(req,res)=>{   
+// app.post('/upload', upload.array('image',10), function(req,res){
+    //     res.send('파일 업로드 완료');
+    // });
+router.post('/boardAdd', upload.array('image',10),(req,res)=>{   
     var boardSeq;
     var seqSql = 'select nextval(nodejs.sq_user_board) as boardSeq from dual';
     maria.query(seqSql,function(err,rows,fields){
@@ -107,26 +125,63 @@ router.post('/boardAdd', upload.single('image'),(req,res)=>{
         var insertSql = 'INSERT INTO nodejs.tb_user_board(board_seq,title,content,category,reg_dt,reg_id,upt_dt,upt_id) values(?,?,?,?,now(),?,now(),?)';
         maria.query(insertSql,params,function(err,rows,fields){  // board table insert
 
-            if(!err){
-                    
-                    // console.log(req.file);
-                    var originalname = req.file.originalname;
-                    var filename = req.file.filename;
-                    var fileParam = [boardSeq,originalname,filename,userId,userId];
-                    var fileInsertQuery = "insert into nodejs.tb_file_list(board_seq, file_origin_name, file_name,del_yn, reg_dt, reg_id, upt_dt,upt_id) values(?,?,?,'N',now(),?,now(),?)";
-                    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8;'});
-                    maria.query(fileInsertQuery,fileParam,function(err,rows,fields){
-                        if(!err){
-                            res.write("<script>alert('글 작성 완료!');location.href='/board/list';</script>");
+            // if(!err){
+            //         // console.log(req.file);  // 단건 파일                   
+            //         var originalname = req.file.originalname;
+            //         var filename = req.file.filename;
+            //         var fileParam = [boardSeq,originalname,filename,userId,userId];
+            //         var fileInsertQuery = "insert into nodejs.tb_file_list(board_seq, file_origin_name, file_name,del_yn, reg_dt, reg_id, upt_dt,upt_id) values(?,?,?,'N',now(),?,now(),?)";
+            //         res.writeHead(200,{'Content-Type':'text/html; charset=utf-8;'});
+            //         maria.query(fileInsertQuery,fileParam,function(err,rows,fields){
+            //             if(!err){
+            //                 res.write("<script>alert('글 작성 완료!');location.href='/board/list';</script>");
                                
-                        }else{
-                            res.write("<script>alert('글 작성 실패!');</script>");
+            //             }else{
+            //                 res.write("<script>alert('글 작성 실패!');</script>");
 
-                        } 
-                    });
+            //             } 
+            //         });
 
                 
-              }
+            //   }
+            if(!err){
+                // console.log(req.files); // 다중 파일
+                let originalname ='';
+                let filename = '';
+                let fileParams =[];
+                let today = new Date();
+
+                for(var i = 0;i < req.files.length;i++){
+                    let fileParam = [];
+                    originalname = req.files[i].originalname;
+                    filename = req.files[i].filename;
+                    fileParam.push(boardSeq);
+                    fileParam.push(originalname);
+                    fileParam.push(filename);
+                    fileParam.push('N');
+                    fileParam.push(today.YYYYMMDD());
+                    fileParam.push(userId);
+                    fileParam.push(today.YYYYMMDD());
+                    fileParam.push(userId);
+
+                    fileParams.push(fileParam);
+                }
+                // console.log(fileParams);
+               
+                var fileInsertQuery = "insert into nodejs.tb_file_list(board_seq, file_origin_name, file_name,del_yn, reg_dt, reg_id, upt_dt,upt_id) values ? ";
+                res.writeHead(200,{'Content-Type':'text/html; charset=utf-8;'});
+                maria.query(fileInsertQuery,[fileParams],function(err,rows,fields){
+                    if(!err){
+                        res.write("<script>alert('글 작성 완료!');location.href='/board/list';</script>");
+                           
+                    }else{
+                        res.write("<script>alert('글 작성 실패!');</script>");
+
+                    } 
+                });
+
+            
+          }
         });
        
 

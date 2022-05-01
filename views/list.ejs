@@ -13,6 +13,13 @@
      .list{
        float: left;
      }
+     .rounded-start{
+       cursor: pointer;
+     }
+
+     .heart{
+       cursor: pointer;
+     }
    </style>
     <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="/public/main.css">
@@ -54,11 +61,11 @@
                         <% } %>
                     <% } %>
                     <% if(result){ %>
-                      <div class="red_heart" data-id="<%= listResult[i].boardSeq %>">
+                      <div class="heart red_heart" data-id="<%= listResult[i].boardSeq %>">
                         <img src="../public/image/red_heart.png" class="heard" alt="favY">                   
                       </div>
                     <% }else{ %>
-                      <div class="empty_heart" data-id="<%= listResult[i].boardSeq %>">
+                      <div class="heart empty_heart" data-id="<%= listResult[i].boardSeq %>">
                         <img src="../public/image/empty_heart.png" class="heard" alt="favN">
                       </div>
                   <% } %>
@@ -239,6 +246,7 @@
             location.href="/board/detail/"+boardSeq;
         });
       </script>
+
       
 
 
