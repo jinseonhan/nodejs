@@ -1,21 +1,72 @@
 <!doctype html>
-<html lang="en">
   <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <style>
+     .heard {
+        max-width: 5%;
+        height: auto;
+     }
 
+     .caption{
+      border : 2px solid black;
+     }
+
+     .list{
+       float: left;
+     }
+     .rounded-start{
+       cursor: pointer;
+     }
+
+     .heart{
+       cursor: pointer;
+     }
+   </style>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
-
-    <title>Hello, world!</title>
+<link rel="stylesheet" href="/public/main.css">
+    <title></title>
   </head>
-  <%- include('nav.html')%>
-
   <body>
-    <p><%=data.id%>님의 마이페이지 입니다.</p>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+    <%- include('nav.html')%>
+  
+    <div class="card mb-3" style="max-width: 540px;">
+      <div class="row g-0">
+        <div class="col-md-4">
+          <!-- 프로필 사진 자리-->
+          <img src="..." class="img-fluid rounded-start" alt="프로필 사진">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title"><%= userId %></h5>
+            <p class="card-text">개시물 갯수 : <%= myBoardCount %></p>
+            <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+        나의 게시물 리스트 자리
+        <% for(var i=0;i < listResult.length;i++){%>
+          <div class="card mb-3" style="max-width: 540px;" >
+            <div class="row g-0" >
+              <div class="col-md-4">
+                <%if(listResult[i].fileName !=null){ %>
+                  <img src="../public/image/<%= listResult[i].fileName %>" class="img-fluid rounded-start" data-id="<%= listResult[i].boardSeq %>"/>
+                <%}else{ %>
+                  <img src="../public/image/default_img.png" class="img-fluid rounded-start" data-id="<%= listResult[i].boardSeq %>"/>
+                <%} %>
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h3 class="detail"><%=listResult[i].title %></h3><!-- 제목 -->
+                  <p><%=listResult[i].categoryName %> </p>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        <% } %>
+    </div>
+    
 
   </body>
 </html>

@@ -6,6 +6,20 @@ const maria = require('../database/connect/maria');
 
 var crypto = require('crypto'); // 암호화
 
+function loginCheck(req,res,next){
+  // 로그인 상태 확인
+  // console.log(req);
+  if(req.user){
+      next();
+  }else{
+      res.send('재 로그인 해주세요.');
+      
+  }
+}
+
+
+
+
 // 회원 가입페이지
 router.get('/registPage',function(req,res){
     res.render("registPage.ejs");
@@ -98,6 +112,34 @@ router.post('/regist',function(req,res){
     // db.collection('login').insertOne({ id: userId, pw : userPw},function(error,result){
     //     res.redirect('/');
     // });
+  });
+
+
+  /* 마이페이지 영역 */
+  router.get('/myPage',loginCheck,function(req,res){ // url , 콜백전 실행 함수
+     // 1. 아아디 불러오기
+    var userId = req.user.userId;
+    var myBoardCount;
+    var myBoardCountsql = 'select count(board_seq) as cnt from nodejs.tb_user_board where reg_id = ? ';
+    // 2. 등록된 게시물 갯수
+    maria.query(myBoardCountsql,userId,function(err,result){ // row : data값(배열로), fields :  data정보
+      
+          myBoardCount = result[0].cnt;  
+      
+    });
+    
+    // 3. 게시물들 불러오기(list와 동일)
+    var myboardListSql='select B.fav as fav,	A.board_seq as boardSeq,A.title as title,	A.view_count as viewCount,A.reg_id as regId,	A.favorite_count as favoriteCount,	DATE_FORMAT( A.upt_dt, "%Y-%m-%d") as uptDt, C.category_name as categoryName, D.file_seq as fileSeq, D.file_name as fileName 	from	nodejs.tb_user_board A left join (	select		board_seq,		count(fav) as fav from		nodejs.tb_board_favorite group by		board_seq )B on	A.board_seq = B.board_seq left JOIN 	(select 		category_seq,		category_name,		category_comment from	nodejs.tb_board_category) C	on A.category = C.category_seq left join (select file_seq, board_seq, file_name from nodejs.tb_file_list) D on	A.board_seq = D.board_seq  where A.reg_id = ? order by A.upt_dt desc';
+
+    maria.query(myboardListSql,userId,function(err2,result2){ // row : data값(배열로), fields :  data정보
+          // result2 는 배열로 받게됨
+          // console.log(myBoardCount);
+          res.render('myPage.ejs',{userId:userId,myBoardCount:myBoardCount,listResult:result2});
+      
+    });
+   
+
+   
   });
 
 

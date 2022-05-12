@@ -104,12 +104,12 @@ app.get('/detail/:id',function(req,res){ // :id : parameter
 });
 
 // edit
-app.get('/editPage/:id',function(req,res){
-    db.collection('post').findOne({_id:parseInt(req.params.id)},function(error,result){
+// app.get('/editPage/:id',function(req,res){
+//     db.collection('post').findOne({_id:parseInt(req.params.id)},function(error,result){
         
-        res.render('editPage.ejs',{data : result});
-    });
-});
+//         res.render('editPage.ejs',{data : result});
+//     });
+// });
 
 app.get('/', function(req,res){
     res.render('index.ejs');
@@ -133,10 +133,7 @@ app.put('/edit',function(req,res){
     });
 });
 
-app.get('/myPage',loginCheck,function(req,res){ // url , 콜백전 실행 함수
-    //console.log(req.user); // string값을 붙이면 데이터값들이 찍히지 않고 (String값+[obj:obj])로 나온다.
-    res.render('myPage.ejs',{data:req.user});
-});
+
 
 function loginCheck(req,res,next){
     // 로그인 상태 확인
@@ -295,7 +292,7 @@ passport.use(new LocalStrategy({
   });
 // npm install multer 라이브러리 적용
   app.post('/upload', upload.single('profile'), function(req,res){
-    console.log(req.file);
+    // console.log(req.file);
     res.send('파일 업로드 완료');
   });
     // app.post('/upload', upload.array('profile',10), function(req,res){

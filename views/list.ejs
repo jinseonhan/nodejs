@@ -131,23 +131,23 @@
         // });
 
         // 게시물 상세보기
-        $('.detail').click(function(e){
-            var id = e.target.dataset.id; // 채팅당한 사람의 id
-            var frm = document.createElement('form');
-            frm.setAttribute('charset','utf-8');
-            frm.setAttribute('method','post');
-            frm.setAttribute('action','/board/detail');
+        // $('.detail').click(function(e){
+        //     var id = e.target.dataset.id; // 채팅당한 사람의 id
+        //     var frm = document.createElement('form');
+        //     frm.setAttribute('charset','utf-8');
+        //     frm.setAttribute('method','post');
+        //     frm.setAttribute('action','/board/detail');
             
-            var hiddenField = document.createElement('input');
-            hiddenField.setAttribute('type','hidden');
-            hiddenField.setAttribute('name','boardSeq');
-            hiddenField.setAttribute('value',id);
-            frm.appendChild(hiddenField);
+        //     var hiddenField = document.createElement('input');
+        //     hiddenField.setAttribute('type','hidden');
+        //     hiddenField.setAttribute('name','boardSeq');
+        //     hiddenField.setAttribute('value',id);
+        //     frm.appendChild(hiddenField);
             
-            document.body.appendChild(frm);
-            frm.submit();
+        //     document.body.appendChild(frm);
+        //     frm.submit();
 
-        });
+        // });
 
 
 
