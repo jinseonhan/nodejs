@@ -21,8 +21,7 @@
         
           <div class="form-group">
               <p>아이디</p>
-              <input type="hidden" class="idClass" id="id" class="form-control" name="id" value="<%= myInfo.userId %>"/>
-              <input type="text" class="idClass" id="idChk" class="form-control" value="<%= myInfo.userId %>"/>
+              <input type="text" class="idClass" class="form-control" value="<%= myInfo.userId %>" readonly/>
 
           </div>
          
@@ -30,7 +29,8 @@
             <p>이메일</p>
             <input type="text" class="form-control" id="email" name="email" value="<%= myInfo.userEmail %>"/>
           </div>
-        <button type="button" class="btn btn-danger" id="submit" value="Submit">회원가입</button>
+        <button type="button" class="btn btn-danger" id="submit">정보수정</button>
+        <button type="button" class="btn btn-primary" id="editPwd">비밀번호 수정(임시)</button>
         </form>
       </div>
 
@@ -45,9 +45,7 @@
         if(!fnValidChk()){
           return false;
         }
-        // 2. submit
-        // document.submitFrm.method='post';
-        // document.submitFrm.action='/member/regist';
+        
         var data = $('#submitFrm').serialize();
         
         $.ajax({
@@ -57,11 +55,11 @@
            
           }).done(function(result){
             if(result=='success'){ 
-              // 회원가입 성공
+              // 회원 정보수정 성공
               alert("회원정보 수정에 성공하였습니다!");
               location.href="/login";
             }else{
-              // 회원가입 실패 
+              // 회원 정보수정 실패 
               alert("회원정보 수정에 실패하였습니다!");
             }
          }).fail(function(xhr, textStatus, errorThrown){
@@ -71,16 +69,17 @@
           });
 
       });
+
+      $("#editPwd").on("click",function(){
+
+      });
+
+
     });
 
     // validChk function
     function fnValidChk(){
         var duplicateResult = $("#duplicateResult").val();
-        if(duplicateResult!='Y'){
-          alert("아이디를 중복체크하세요.");
-          $("#id").focus();
-          return false;
-        }
 
         var email = $("#email").val();
         if(email.length==0){
@@ -98,5 +97,8 @@
 
         return true;
     }
+
+
+    
   </script>
 </html>

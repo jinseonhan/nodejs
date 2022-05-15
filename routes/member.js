@@ -136,7 +136,7 @@ router.post('/regist',function(req,res){
       
     });
    
-    // 회원정보 수정
+    // 회원정보 수정 페이지
     router.get('/editInfomyPage',loginCheck,function(req,res){ // url , 콜백전 실행 함수
 
         var userId = req.user.userId;
@@ -147,8 +147,8 @@ router.post('/regist',function(req,res){
               var user = new Object();
               user.userEmail = decrypt(result[0].userEmail, encryptKey);
               user.userId = userId;
-              console.log(user.userId);
-              console.log(user.userEmail);
+              // console.log(user.userId);
+              // console.log(user.userEmail);
               res.render('editInfoPage.ejs',{myInfo:user});
             }
 
@@ -158,6 +158,33 @@ router.post('/regist',function(req,res){
    
   });
 
+  // 회원정보수정하기
+  router.post('/update',function(req,res){
+    var userId = req.user.userId;
+    var userEmail = encrypt(req.body.email,encryptKey);
+    
+    var params =[
+      userEmail
+      ,userId
+    ];
+    var updateSql ='update nodejs.tb_user_pub set user_email = ? where user_id = ?';
+    maria.query(updateSql,params,function(err,rows,fields){ // row : data값(배열로), fields :  data정보
+      // console.log(rows);
+      if(!err){
+        if(rows.affectedRows>0){
+              
+          res.send('success');
+        }else{
+          
+          res.send('fail');
+        }
+      }else{
+        res.send('fail');
+      }
+
+
+    });
+  });
 
   module.exports = router; // module.exports = 내보낼 변수명
 
