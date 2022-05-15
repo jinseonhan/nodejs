@@ -36,7 +36,7 @@
         </div>
         <div class="col-md-8">
           <div class="card-body">
-            <h5 class="card-title"><%= userId %></h5>
+            <h5 class="card-title"><%= userId %> <button type="button" id="editBtn">설정</button></h5>
             <p class="card-text">개시물 갯수 : <%= myBoardCount %></p>
             <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
           </div>
@@ -69,4 +69,11 @@
     
 
   </body>
+
+  <script>
+      $("#editBtn").on("click",function(){
+          location.href="/member/editInfoMyPage";
+      });
+    
+  </script>
 </html>

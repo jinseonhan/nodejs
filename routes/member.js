@@ -4,8 +4,6 @@ var router = require('express').Router(); // 라우터 만들때 필수!
 
 const maria = require('../database/connect/maria');
 
-var crypto = require('crypto'); // 암호화
-
 function loginCheck(req,res,next){
   // 로그인 상태 확인
   // console.log(req);
@@ -64,7 +62,7 @@ router.post('/idDuplicateChk',function(req,res){
 router.post('/regist',function(req,res){
     var userId = req.body.id;
     var userPwd = crypto.createHash('sha512').update(req.body.pw).digest('base64');
-    var userEmail = crypto.createHash('sha512').update(req.body.email).digest('base64');
+    var userEmail = encrypt(req.body.email,encryptKey);
     var seq = '';
     //  기능 만들기
     // * pwd, email 암호화
@@ -138,7 +136,25 @@ router.post('/regist',function(req,res){
       
     });
    
+    // 회원정보 수정
+    router.get('/editInfomyPage',loginCheck,function(req,res){ // url , 콜백전 실행 함수
 
+        var userId = req.user.userId;
+        var myInfoSql = "select user_email as userEmail from nodejs.tb_user_pub where user_id = ?";
+        maria.query(myInfoSql,userId,function(err,result){ 
+            if(!err){
+
+              var user = new Object();
+              user.userEmail = decrypt(result[0].userEmail, encryptKey);
+              user.userId = userId;
+              console.log(user.userId);
+              console.log(user.userEmail);
+              res.render('editInfoPage.ejs',{myInfo:user});
+            }
+
+        });
+
+    });
    
   });
 

@@ -24,8 +24,44 @@ const session = require('express-session');
 app.use(session({secret:'secretCode', resave:true, saveUninitialized:false}));
 app.use(passport.initialize());
 app.use(passport.session());
-var crypto = require('crypto'); // 암호화
 
+/* S : 유저 객체 */
+// const userOjt = function(userSeq,userId,userPwd,userEmail,regId,regDt,uptId,uptDt){
+//    this.userSeq = userSeq;
+//    this.userId = userId;
+//    this.userPwd = userPwd;
+//    this.userEmail = userEmail;
+//    this.regId = regId;
+//    this.regDt = regDt;
+//    this.uptId = uptId;
+//    this.uptDt = uptDt;
+//    this.toString = function(){
+//       return 'userSeq : '+userSeq+ ', userId : '+userId+ '\n';
+//    }
+// }
+// global.userOjt = userOjt;
+/* E : 유저 객체 */
+
+/*  S : 암호화 모듈 연결 */
+const crypto = require('crypto'); // 단방향 암호화
+global.crypto = crypto;
+const crpyto_js = require('crypto-js'); // 양방향 암호화
+/*  E : 암호화 모듈 연결 */
+
+/* S : 암호화 모듈 */
+function encrypt(data, key){
+  return crpyto_js.AES.encrypt(data,key).toString();
+}
+function decrypt(data, key){
+  return crpyto_js.AES.decrypt(data,key).toString(crpyto_js.enc.Utf8);
+}
+global.encrypt = encrypt;
+global.decrypt = decrypt;
+
+const encryptKey ="jshan"; // 암호화 키값
+global.encryptKey = encryptKey;
+
+/* E : 암호화 모듈 */
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.set('view engine','ejs');
@@ -292,7 +328,7 @@ passport.use(new LocalStrategy({
   });
 // npm install multer 라이브러리 적용
   app.post('/upload', upload.single('profile'), function(req,res){
-    // console.log(req.file);
+    //console.log(req.file);
     res.send('파일 업로드 완료');
   });
     // app.post('/upload', upload.array('profile',10), function(req,res){
