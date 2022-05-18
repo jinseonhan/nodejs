@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
 
     <title>회원정보 수정</title>
+    
   </head>
   <%- include('nav.html')%>
   
@@ -30,7 +31,7 @@
             <input type="text" class="form-control" id="email" name="email" value="<%= myInfo.userEmail %>"/>
           </div>
         <button type="button" class="btn btn-danger" id="submit">정보수정</button>
-        <button type="button" class="btn btn-primary" id="editPwd">비밀번호 수정(임시)</button>
+        <button type="button" class="btn btn-primary" id="editPwd">비밀번호 변경</button>
         </form>
       </div>
 
@@ -70,8 +71,11 @@
 
       });
 
-      $("#editPwd").on("click",function(){
 
+      // pwd 변경(modal)
+      $("#editPwd").on("click",function(){
+          
+          modal("/member/editPwd", "비밀번호 변경");
       });
 
 
@@ -98,7 +102,56 @@
         return true;
     }
 
-
+    /* S : 공통 모달 */
+function modal(loadUrl,title){
     
+      
+    $.ajax({
+        method : 'get'
+        , url : "/modal"
+        , dataType : 'html'
+        //, data : {fileSeq : fileSeq}
+    }).done(function(result){
+        var modalFrame ='';
+        modalFrame += (result);
+
+        $("body").append(modalFrame);
+        $(".modal-title").html(title);
+
+        modalPage(loadUrl,title);
+
+    }).fail(function(xhr, textStatus, errorThrown){
+        // 실패
+        // xhr
+        // textStatus : error code
+        // errorThrown : error msg
+        console.log(xhr, textStatus, errorThrown);
+
+      });
+
+}
+/* E : 공통 모달 */
+/* S : 모달에 들어갈 페이지 */
+function modalPage(loadUrl,title){
+  $.ajax({
+        method : 'get'
+        , url : loadUrl
+        , dataType : 'html'
+        //, data : {fileSeq : fileSeq}
+    }).done(function(result){
+      
+      $(".modal-body").html(result);
+
+    }).fail(function(xhr, textStatus, errorThrown){
+        // 실패
+        // xhr
+        // textStatus : error code
+        // errorThrown : error msg
+        console.log(xhr, textStatus, errorThrown);
+
+      });
+}
+/* E : 모달에 들어갈 페이지 */
+
   </script>
 </html>

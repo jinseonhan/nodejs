@@ -185,6 +185,42 @@ router.post('/regist',function(req,res){
 
     });
   });
+  // pwd 변경 페이지
+  router.get('/editPwd',function(req,res){
+      res.render("editPwd.ejs");
+      // console.log("들어옴")
+  });
+
+  // pwd 변경
+  router.post('/editPwd',function(req,res){
+    var userId = req.user.userId;
+    var originPwd = crypto.createHash('sha512').update(req.body.originPwd).digest('base64');
+    var changePwd1 = crypto.createHash('sha512').update(req.body.changePwd1).digest('base64');
+    var params =[    
+      userId,
+      originPwd
+    ];
+    // 1. 아이디와 비밀번호가 일치하는 것이 있는지
+    var selectSql ='select user_pwd from nodejs.tb_user_pub  where user_id = ? and user_pwd = ?';
+    maria.query(selectSql,params,function(err,rows,fields){ // row : data값(배열로), fields :  data정보
+      
+      if(!err){
+        if(rows.affectedRows>0){
+              
+          res.send('success');
+        }else{
+          
+          res.send('fail');
+        }
+      }else{
+        res.send('fail');
+      }
+
+
+    });
+
+
+  });
 
   module.exports = router; // module.exports = 내보낼 변수명
 

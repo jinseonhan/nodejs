@@ -63,6 +63,9 @@ global.encryptKey = encryptKey;
 
 /* E : 암호화 모듈 */
 
+
+
+
 app.use(bodyParser.urlencoded({extended:true}));
 app.set('view engine','ejs');
 
@@ -338,7 +341,11 @@ passport.use(new LocalStrategy({
   app.get('/image/:imageName',function(req,res){
       res.sendFile(__dirname+'/public/image/'+req.params.imageName);
   }); 
-
+  
+  // 모달페이지
+  app.get('/modal',function(req,res){
+    res.render("modal.ejs");
+  });
   // TODO : 채팅방 들어가기
   // 1. 로그인이 되어있는지 확인
   // 2. 해당 게시물을 작성한 사람과 로그인한 사람의 데이터를 DB에 저장

@@ -1,0 +1,101 @@
+
+<div class="container mt-4">
+  
+  <form id="pwdSubmitFrm" name="pwdSubmitFrm" method="post" action="/member/editPwd" onsubmit="return false;">
+  
+    <div class="form-group">
+        <p>현재 비밀번호</p>
+        <input type="password" class="form-control" id="originPwd" name="originPwd"/>
+
+    </div>
+    
+    <div class="form-group">
+      <p>변경할 비밀번호</p>
+      <input type="password" class="form-control" id="changePwd1" name="changePwd1" />
+    </div>
+    <div class="form-group">
+      <p>변경할 비밀번호 확인</p>
+      <input type="password" class="form-control" id="changePwd2"/>
+    </div>
+    <button type="button" class="btn btn-primary" id="subBtn">저장</button>
+    <button type="button" class="btn btn-secondary closeBtn" >닫기</button>
+  </form>
+</div>
+<script>
+  
+   $(".closeBtn").on("click",function(){
+      if(confirm("저장하지 않고 창을 닫으시겠습니까?")){
+         $(".modal").remove();
+      }
+   });
+
+   $("#subBtn").on("click",function(){
+      editPwd();
+   });
+
+   function editPwd(){
+     
+    
+    if(!validChk()){
+        return false;
+    }
+
+     // 현재 PWD가 맞는지 확인 후 변경할 PWD로 변경한다.(PWd 변경 히스토리 테이블 생성, 변경 날짜/ 이전PWD)
+     $.ajax({
+        method : 'post'
+        , url : '/member/editPwd'
+        , data : $("#pwdSubmitFrm").serialize()
+        , dataType : 'json'
+        //, data : {fileSeq : fileSeq}
+    }).done(function(data){
+      if(data.result=="success"){
+          alert("비밀번호 변경에 성공하였습니다!");
+
+          modalCloase();
+      }else{
+        alert("비밀번호 변경에 실패하였습니다.");
+      }
+      
+
+    }).fail(function(xhr, textStatus, errorThrown){
+        // 실패
+        // xhr
+        // textStatus : error code
+        // errorThrown : error msg
+        console.log(xhr, textStatus, errorThrown);
+
+      });
+
+   }
+
+   function validChk(){
+    var originPwd = $("#originPwd").val();
+     var changePwd1 = $("#changePwd1").val();
+     var changePwd2 = $("#changePwd2").val();
+
+     if(originPwd.length==0){
+       alert("[현재 비밀번호]를 입력해주세요.");
+       return false;
+     }
+
+     if(changePwd1.length==0){
+       alert("[변경할 비밀번호]를 입력해주세요.");
+       return false;
+     }
+
+     if(changePwd2.length==0){
+       alert("[변경할 비밀번호 확인]을 입력해주세요.");
+       return false;
+     }
+     if(changePwd2 != changePwd1){
+       alert("변경할 비밀번호가 일치하지 않습니다.");
+       return false;
+     }
+
+     return true;
+   }
+
+   function modalClose(){
+     $(".modal").remove();
+   }
+</script>
