@@ -45,13 +45,17 @@
         method : 'post'
         , url : '/member/editPwd'
         , data : $("#pwdSubmitFrm").serialize()
-        , dataType : 'json'
         //, data : {fileSeq : fileSeq}
     }).done(function(data){
-      if(data.result=="success"){
+      console.log("data : "+ data);
+      if(data=="success"){
           alert("비밀번호 변경에 성공하였습니다!");
 
-          modalCloase();
+          modalClose();
+      }else if(data =='duplicate'){
+        alert("현재 비밀번호나 직정 비밀번호를 사용하실 수 없습니다.");
+      }else if(data=='notExist'){
+        alert("일치하는 정보가 없습니다.");
       }else{
         alert("비밀번호 변경에 실패하였습니다.");
       }
