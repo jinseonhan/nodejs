@@ -201,7 +201,7 @@ router.post('/regist',function(req,res){
       originPwd
     ];
     // 1. 아이디와 비밀번호가 일치하는 것이 있는지
-    var selectSql1 ='select user_pwd as userPwd from nodejs.tb_user_pub  where user_id = ? and user_pwd = ?';
+    var selectSql1 ='select ifnull(user_pwd,"no") as userPwd from nodejs.tb_user_pub  where user_id = ? and user_pwd = ?';
     maria.query(selectSql1,params,function(err,rows,fields){ // row : data값(배열로), fields :  data정보
       var userPwd = rows[0].userPwd;
       if(err){
@@ -209,46 +209,46 @@ router.post('/regist',function(req,res){
 
         res.send('fail'); 
       }else{
-        if(userPwd != originPwd){
+        if(userPwd != originPwd || userPwd == 'no'){
           res.send('notExist')
+        }else{
+            // 2. 이전 pwd, 현재 pwd와 비교하여 같은 것이면 안됨
+            var selectSql2 ='select B.prev_pwd as prevPwd, B.new_pwd as newPwd from nodejs.tb_user_pub A left join nodejs.tb_pwd_hist B on A.user_seq = B.user_seq where A.user_id = ?';
+            maria.query(selectSql2,[userId],function(err2,rows2,fields2){ // row : data값(배열로), fields :  data정보
+              if(err2){
+                console.log("err2");
+                res.send('fail'); 
+              }else{
+                // 입력된 pwd와 prevPwd, newPwd 값이 같은것이 있는지 확인
+                if(changePwd1 == rows2[0].prevPwd || changePwd1 == rows2[0].newPwd){
+                  res.send('duplicate');
+                }else{
+                    // 3. 위의 2가지 조건을 만족하면 현재 pwd를 변경하고, pwd history 테이블의 값도 업데이트한다.
+                    var updateParams = [
+                      changePwd1,
+                      changePwd1,
+                      userId,
+                      userId,
+                      userId
+                    ];
+                    var updateSql ='UPDATE  nodejs.tb_user_pub A, nodejs.tb_pwd_hist B SET  A.user_pwd  = ?, B.prev_pwd = B.new_pwd, B.new_pwd = ?, B.upt_dt = now(), A.upt_dt  = now(), A.upt_id = ?, B.upt_id = ? WHERE A.user_id = ?';
+                    maria.query(updateSql,updateParams,function(err3,rows3,fields3){ // rows : data값(배열로), fields :  data정보
+                      if(err3){
+                        console.log("err3");
+
+                        res.send('fail'); 
+                      }else{
+                        res.send('success');
+                      }
+                      
+                    });
+                }
+              }
+            });
         }
       }
     });
-
-    // 2. 이전 pwd, 현재 pwd와 비교하여 같은 것이면 안됨
-    var selectSql2 ='select B.prev_pwd as prevPwd, B.new_pwd as newPwd from nodejs.tb_user_pub A left join nodejs.tb_pwd_hist B on A.user_seq = B.user_seq where A.user_id = ?';
-    maria.query(selectSql2,[userId],function(err2,rows2,fields2){ // row : data값(배열로), fields :  data정보
-      if(err2){
-        console.log("err2");
-        res.send('fail'); 
-      }else{
-        // 입력된 pwd와 prevPwd, newPwd 값이 같은것이 있는지 확인
-        if(changePwd1 == rows2[0].prevPwd || changePwd1 == rows2[0].newPwd){
-          res.send('duplicate');
-        }
-      }
-    });
-
-    // 3. 위의 2가지 조건을 만족하면 현재 pwd를 변경하고, pwd history 테이블의 값도 업데이트한다.
-    var updateParams = [
-      changePwd1,
-      changePwd1,
-      userId,
-      userId,
-      userId
-    ];
-    var updateSql ='UPDATE  nodejs.tb_user_pub A, nodejs.tb_pwd_hist B SET  A.user_pwd  = ?, B.prev_pwd = B.new_pwd, B.new_pwd = ?, B.upt_dt = now(), A.upt_dt  = now(), A.upt_id = ?, B.upt_id = ? WHERE A.user_id = ?';
-    maria.query(updateSql,updateParams,function(err3,rows3,fields3){ // rows : data값(배열로), fields :  data정보
-      if(err3){
-        console.log("err3");
-
-        res.send('fail'); 
-      }else{
-        res.send('success');
-      }
-      
-    });
-
+   //  maria.end();
 
   });
 
