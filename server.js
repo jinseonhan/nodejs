@@ -183,6 +183,7 @@ function loginCheck(req,res,next){
     }
 }
 
+
 app.get('/login',function(req,res){
 
     res.render('login.ejs');
@@ -197,7 +198,15 @@ app.post('/login',passport.authenticate('local',{
   
   res.send('success');
 });
-
+app.get('/logout',function(req, res){
+  req.logout();
+  
+  req.session.save(function(){
+      res.writeHead(200,{'Content-Type':'text/html;charset=utf-8'});
+      res.write("<script>alert('로그아웃 되었습니다!')</script>");    
+      res.write("<script>window.location='/'</script>");
+  });
+});
 app.get('/fail',function(req,res){
     res.render('fail.ejs');
 });
