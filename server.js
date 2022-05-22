@@ -9,8 +9,9 @@ const app = express();
 const maria = require('./database/connect/maria');
 maria.connect();
 
-// XSS 방지( TODO)
-
+// XSS 방지
+const helmet = require('helmet');
+app.use(helmet());
 
 // socket.io lib
 const http = require('http').createServer(app);
