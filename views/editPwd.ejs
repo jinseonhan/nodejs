@@ -50,8 +50,8 @@
       console.log("data : "+ data);
       if(data=="success"){
           alert("비밀번호 변경에 성공하였습니다!");
-
-          modalClose();
+          location.href="/logout?page=editPwd";
+          // modalClose();
       }else if(data =='duplicate'){
         alert("[현재 비밀번호]나 [직전 비밀번호]를 사용하실 수 없습니다.");
       }else if(data=='notExist'){

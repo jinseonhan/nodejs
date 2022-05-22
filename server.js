@@ -9,6 +9,9 @@ const app = express();
 const maria = require('./database/connect/maria');
 maria.connect();
 
+// XSS 방지( TODO)
+
+
 // socket.io lib
 const http = require('http').createServer(app);
 const {Server} = require('socket.io');
@@ -199,11 +202,17 @@ app.post('/login',passport.authenticate('local',{
   res.send('success');
 });
 app.get('/logout',function(req, res){
+  var page = req.query.page; // get의 쿼리스트링으로 들어온 값을 받기 위한 변수
   req.logout();
   
   req.session.save(function(){
       res.writeHead(200,{'Content-Type':'text/html;charset=utf-8'});
-      res.write("<script>alert('로그아웃 되었습니다!')</script>");    
+      if(page=='editPwd'){  
+        res.write("<script>alert('변경사항을 적용하기 위해 재 로그인해주세요!')</script>");
+      }else{
+        res.write("<script>alert('로그아웃 되었습니다!')</script>");
+      }
+          
       res.write("<script>window.location='/'</script>");
   });
 });
