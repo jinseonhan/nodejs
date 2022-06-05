@@ -1,10 +1,5 @@
-<!doctype html>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js" ></script>
+<%- include('nav.html')%>
 
-<html lang="en">
-  <head>
-    <title>로그인</title>
-  </head>
   <script>
     $(document).ready(function(){
       // 회원 가입 페이지
@@ -49,9 +44,8 @@
     }
 
   </script>
-  <%- include('nav.html')%>
 
-  <body>
+ 
     <form name="submitFrm" id="submitFrm" method="post" onsubmit="return false;">
       <div class="card mb-3" style="max-width: 540px;">
         <div class="row g-0">
@@ -81,5 +75,4 @@
 
       </form>
      
-    </body>
 </html>
