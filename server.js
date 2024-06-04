@@ -351,7 +351,7 @@ passport.use(new LocalStrategy({
             }
             callback(null, true)
       },
-      limits:{ // 파일사이즈 제한
+      limits:{ // 파일사이즈 제한f
         fileSize: 1024 * 1024
     }
   }); // ROM에 저장
